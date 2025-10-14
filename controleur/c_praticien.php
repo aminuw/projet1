@@ -1,37 +1,34 @@
 <?php
+include_once("modele/praticien.modele.inc.php");
+
 if (!isset($_REQUEST['action']) || empty($_REQUEST['action'])) {
 	$action = "formulairepraticien";
 } else {
 	$action = $_REQUEST['action'];
 }
 switch ($action) {
-	case 'formulairemedoc': {
+	case 'formulairepraticien': {
+		$praticiens = getAllPraticiens();
+		include("vues/v_formulairePraticien.php");
+		break;
+	}
 
-			$result = getAllNomMedicament();
-			include("vues/v_formulaireMedicament.php");
-			break;
+	case 'afficherpraticien': {
+		if (isset($_REQUEST['praticien']) && getPraticienById($_REQUEST['praticien'])) {
+			$praticien = getPraticienById($_REQUEST['praticien']);
+			$infos = getInfosPraticien($_REQUEST['praticien']);
+			$specialite = getSpecialitePraticien($_REQUEST['praticien']);
+			include("vues/v_afficherPraticien.php");
+		} else {
+			$_SESSION['erreur'] = true;
+			header("Location: index.php?uc=praticien&action=formulairepraticien");
 		}
-
-	case 'affichermedoc': {
-
-			if (isset($_REQUEST['medicament']) && getAllInformationMedicamentDepot($_REQUEST['medicament'])) {
-				$med = $_REQUEST['medicament'];
-				$carac = getAllInformationMedicamentDepot($med);
-				if (empty($carac[7])) {
-					$carac[7] = 'Non défini(e)';
-				}
-				include("vues/v_afficherMedicament.php");
-			} else {
-				$_SESSION['erreur'] = true;
-				header("Location: index.php?uc=medicaments&action=formulairemedoc");
-			}
-			break;
-		}
+		break;
+	}
 
 	default: {
-
-			header('Location: index.php?uc=medicaments&action=formulairemedoc');
-			break;
-		}
+		header('Location: index.php?uc=praticien&action=formulairepraticien');
+		break;
+	}
 }
 ?>

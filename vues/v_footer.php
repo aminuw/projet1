@@ -23,7 +23,7 @@
                                     <i class=\'bx-fw bx bxs-chevron-right bx-xs\'></i><a class="text-decoration-none text-light py-1" href="index.php?uc=medicaments&action=formulairemedoc">Médicaments</a>
                                 </li>
                                 <li class="pb-2">
-                                    <i class=\'bx-fw bx bxs-chevron-right bx-xs\'></i><a class="text-decoration-none text-light py-1" href="index.php?uc=praticiens&action=formulairepraticien">Praticiens</a>
+                                    <i class=\'bx-fw bx bxs-chevron-right bx-xs\'></i><a class="text-decoration-none text-light py-1" href="index.php?uc=praticien&action=formulairepraticien">Praticiens</a>
                                 </li>
                                 <li class="pb-2 dropdown">
                                     <i class=\'bx-fw bx bxs-chevron-right bx-xs\'></i><a class="text-decoration-none text-light py-1" href="#" id="navbarDarkDropdownMenuLink" role="button" data-bs-toggle="dropdown" aria-expanded="false">Rapport de visite</a>
