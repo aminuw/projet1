@@ -137,6 +137,32 @@ function getCountMatricule()
     }
 }
 
+function getRegionByLoginId($loginId)
+{
+    try {
+        $monPdo = connexionPDO();
+        $req = "
+            SELECT r.REG_CODE AS region_code
+            FROM login l
+            JOIN collaborateur c ON l.COL_MATRICULE = c.COL_MATRICULE
+            JOIN region r ON c.REG_CODE = r.REG_CODE
+            WHERE l.LOG_ID = :loginId
+            LIMIT 1
+        ";
+        $stmt = $monPdo->prepare($req);
+        $stmt->bindParam(':loginId', $loginId, PDO::PARAM_INT);
+        $stmt->execute();
+
+        $result = $stmt->fetch(PDO::FETCH_ASSOC);
+        return $result ? $result['region_code'] : null;
+    } 
+    catch (PDOException $e) {
+        die("Erreur SQL (getRegionByLoginId) : " . $e->getMessage());
+    }
+}
+
+
+
 /* ANCIENNES FONCTIONS QUI A PERMIS DE SET LES LOGINS, LES HABILITATIONS ET LA MONNAIE DES MEDOCS
 
 function concatMotDePasseBrut($mat) : string {

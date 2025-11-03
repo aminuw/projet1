@@ -34,6 +34,10 @@
                             <a class="nav-link btn-outline-info rounded-pill px-3 fw-bold" href="index.php?uc=praticien&action=formulairepraticien">Praticiens</a>
                         </li>
                         <li class="nav-item ">
+                            <a class="nav-link btn-outline-info rounded-pill px-3 fw-bold" href="index.php?uc=rapport&action=saisir">Rapports</a>
+                        </li>
+                        <!-- NOUVEAU LIEN -->
+                        <li class="nav-item ">
                             <a class="nav-link btn-outline-info rounded-pill px-3 fw-bold" href="index.php?uc=connexion&action=profil">Profil</a>
                         </li>
                         <li class="nav-item">

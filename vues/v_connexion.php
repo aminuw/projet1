@@ -6,6 +6,7 @@ if (isset($_POST['connexion'])) {
         $userEmpty = "Veuillez saisir votre mot de passe !";
     } else {
         $arr = checkConnexion($_POST['username'], $_POST['password']);
+        var_dump($arr);
         if (empty($arr)) {
             $userEmpty = "Informations incorrectes !";
         } else {
@@ -13,6 +14,7 @@ if (isset($_POST['connexion'])) {
             $_SESSION['login'] = $arr['id_log'];
             $_SESSION['matricule'] = $arr['matricule'];
             $_SESSION['erreur'] = false;
+            $_SESSION['region'] = $arr['REG_CODE'];
             header('Location: index.php?uc=connexion&action=profil');
         }
     }
