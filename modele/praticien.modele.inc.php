@@ -106,7 +106,7 @@ function addPraticien($pra_num, $pra_prenom, $pra_nom, $pra_adresse, $pra_cp, $p
         $stmt->execute();
 
         if (!empty($spe_code)) {
-            // Check if a specialty is already associated with the practitioner
+
             $req = 'SELECT COUNT(*) FROM posseder WHERE PRA_NUM = :pra_num AND SPE_CODE = :spe_code';
             $stmt = $monPdo->prepare($req);
             $stmt->bindParam(':pra_num', $pra_num, PDO::PARAM_INT);
@@ -174,7 +174,6 @@ function getSpecialitePraticien($id)
     $stmt->execute();
     $result = $stmt->fetchAll(PDO::FETCH_COLUMN);
 
-    // Retourne "Non spécifié" si aucune spécialité trouvée
     if (empty($result)) {
         return ["Non spécifiée"];
     }
@@ -226,7 +225,6 @@ function updatePraticien($pra_num, $pra_prenom, $pra_nom, $pra_adresse, $pra_cp,
         $stmt->execute();
 
         if (!empty($spe_code)) {
-            // Check if a specialty is already associated with the practitioner
             $req = 'SELECT COUNT(*) FROM posseder WHERE PRA_NUM = :pra_num AND SPE_CODE = :spe_code';
             $stmt = $monPdo->prepare($req);
             $stmt->bindParam(':pra_num', $pra_num, PDO::PARAM_INT);
@@ -242,7 +240,6 @@ function updatePraticien($pra_num, $pra_prenom, $pra_nom, $pra_adresse, $pra_cp,
                 $stmt->execute();
             }
         } else {
-            // If no specialty is selected, delete all existing specialties for this practitioner
             $req = 'DELETE FROM posseder WHERE PRA_NUM = :pra_num';
             $stmt = $monPdo->prepare($req);
             $stmt->bindParam(':pra_num', $pra_num, PDO::PARAM_INT);

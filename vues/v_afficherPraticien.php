@@ -22,7 +22,6 @@
                         <p><span class="carac">Département</span> : <?php echo $infos['Departement']; ?></p>
                     <?php endif; ?>
                     <input class="btn btn-info text-light valider col-6 col-sm-5 col-md-4 col-lg-3" type="button" onclick="history.go(-1)" value="Retour">
-                    <a href="index.php?uc=praticien&action=modifierpraticien&praticien=<?php echo $praticien['PRA_NUM']; ?>" class="btn btn-success text-light col-6 col-sm-5 col-md-4 col-lg-3 mt-2">Modifier le praticien</a>
                 </div>
             </div>
         </div>
