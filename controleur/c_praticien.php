@@ -7,10 +7,16 @@ if (!isset($_REQUEST['action']) || empty($_REQUEST['action'])) {
 	$action = $_REQUEST['action'];
 }
 switch ($action) {
-    case 'formulairepraticien': {
+    case 'gererParRegion': {
         $loginId = $_SESSION['login'];
         $region = getRegionByLoginId($loginId);
         $praticiens = getAllPraticiensByRegion($region);
+        include("vues/v_formulairePraticien.php");
+        break;
+    }
+
+    case 'gererTous': {
+        $praticiens = getAllPraticiens();
         include("vues/v_formulairePraticien.php");
         break;
     }

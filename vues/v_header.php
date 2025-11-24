@@ -30,12 +30,17 @@
                         <li class="nav-item ">
                             <a class="nav-link btn-outline-info rounded-pill px-3 fw-bold" href="index.php?uc=medicaments&action=formulairemedoc">Médicaments</a>
                         </li>
-                        <li class="nav-item ">
-                            <a class="nav-link btn-outline-info rounded-pill px-3 fw-bold" href="index.php?uc=praticien&action=formulairepraticien">Praticiens</a>
-                             <li id="sous-sousmenu"><a href="#">Brocoli</a></li>
-                        <li id="sous-sousmenu"><a href="#">Petits pois</a></li>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle btn-outline-info rounded-pill px-3 fw-bold" href="#" id="praticienDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                Gérer Praticien
+                            </a>
+                            <ul class="dropdown-menu" aria-labelledby="praticienDropdown">
+                                <li><a class="dropdown-item" href="index.php?uc=praticien&action=gererTous">Tous Praticiens</a></li>
+                                <li><a class="dropdown-item" href="index.php?uc=praticien&action=gererParRegion">Praticien par Région</a></li>
+                                <li><a class="dropdown-item" href="index.php?uc=praticien&action=ajoutpraticien">Ajouter Praticien</a></li>
+
+                            </ul>
                         </li>
-                        
                         <li class="nav-item ">
                             <a class="nav-link btn-outline-info rounded-pill px-3 fw-bold" href="index.php?uc=rapport&action=saisir">Rapports</a>
                         </li>

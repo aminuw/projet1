@@ -38,9 +38,6 @@
                     </div>
                 </form>
                 <div class="mt-3 text-center">
-                    <a href="index.php?uc=praticien&action=ajoutpraticien" class="btn btn-success">
-                        Ajouter un praticien
-                    </a>
                 </div>
             </div>
         </div>
