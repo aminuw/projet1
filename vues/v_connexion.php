@@ -6,7 +6,7 @@ if (isset($_POST['connexion'])) {
         $userEmpty = "Veuillez saisir votre mot de passe !";
     } else {
         $arr = checkConnexion($_POST['username'], $_POST['password']);
-        var_dump($arr);
+        //var_dump($arr);
         if (empty($arr)) {
             $userEmpty = "Informations incorrectes !";
         } else {

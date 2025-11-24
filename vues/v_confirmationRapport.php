@@ -45,9 +45,9 @@
                                 <button type="submit" class="btn btn-warning px-4">
                                     <i class="bi bi-check-circle"></i> Confirmer quand même
                                 </button>
-                                <a href="index.php?uc=rapport&action=saisir" class="btn btn-secondary px-4">
+                                  <button type="button" onclick="history.back()" class="btn btn-secondary px-4">
                                     <i class="bi bi-arrow-left"></i> Revenir en arrière
-                                </a>
+                                </button>
                             </div>
                         </form>
                     </div>

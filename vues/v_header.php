@@ -41,8 +41,27 @@
 
                             </ul>
                         </li>
-                        <li class="nav-item ">
-                            <a class="nav-link btn-outline-info rounded-pill px-3 fw-bold" href="index.php?uc=rapport&action=saisir">Rapports</a>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link btn-outline-info rounded-pill px-3 fw-bold dropdown-toggle" 
+                            href="#" 
+                            id="navbarDropdownRapport" 
+                            role="button" 
+                            data-bs-toggle="dropdown" 
+                            aria-expanded="false">
+                                Rapports
+                            </a>
+                            <ul class="dropdown-menu" aria-labelledby="navbarDropdownRapport">
+                                <li>
+                                    <a class="dropdown-item" href="index.php?uc=rapport&action=saisir">
+                                        <i class="navbar-toggler border-0"></i> Saisir un rapport
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item" href="index.php?uc=consultation&action=formulaire">
+                                        <i class="navbar-toggler border-0"></i> Consulter rapport(s)
+                                    </a>
+                                </li>
+                            </ul>
                         </li>
                         <li class="nav-item ">
                             <a class="nav-link btn-outline-info rounded-pill px-3 fw-bold" href="index.php?uc=connexion&action=profil">Profil</a>

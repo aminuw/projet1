@@ -1,4 +1,6 @@
 <?php
+    ob_start();
+
     require_once ('modele/medicament.modele.inc.php');
    
     require_once ('modele/connexion.modele.inc.php');
@@ -49,6 +51,15 @@
             }
             break;
         }
+             case 'consultation' :
+        {   
+            if(!empty($_SESSION['login'])){
+                include("controleur/c_consultation_rapport.php");
+            }else{
+                include("vues/v_accesInterdit.php");
+            }
+            break;
+        }
     
         case 'connexion' :
         {   
@@ -63,6 +74,9 @@
         }
     }
 ?>
-<?php include("vues/v_footer.php") ;?>
+<?php include("vues/v_footer.php") ;
+    ob_end_flush(); 
+
+?>
 </body>
 </html>

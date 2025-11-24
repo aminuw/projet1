@@ -70,7 +70,8 @@ function insertRapportVisite($data)
                     COL_MATRICULE, 
                     RAP_NUM, 
                     RAP_DATEVISITE, 
-                    RAP_BILAN, 
+                    RAP_BILAN,
+                    RAP_MOTIF,
                     PRA_NUM, 
                     PRA_NUM_praticien,
                     MED_DEPOTLEGAL_1, 
@@ -82,6 +83,7 @@ function insertRapportVisite($data)
                     :num_rapport,
                     :date_visite,
                     :bilan,
+                    :motif,
                     :pra_num,
                     :pra_remplacant,
                     :med1,
@@ -96,6 +98,11 @@ function insertRapportVisite($data)
         $stmt->bindParam(':num_rapport', $data['num_rapport'], PDO::PARAM_INT);
         $stmt->bindParam(':date_visite', $data['date_visite'], PDO::PARAM_STR);
         $stmt->bindParam(':bilan', $data['bilan'], PDO::PARAM_STR);
+        
+        // Motif
+        $motif = !empty($data['motif']) ? $data['motif'] : null;
+        $stmt->bindParam(':motif', $motif, PDO::PARAM_INT);
+        
         $stmt->bindParam(':pra_num', $data['praticien'], PDO::PARAM_INT);
         
         // Paramètres optionnels
@@ -305,6 +312,7 @@ function updateRapportVisite($data)
         $req = 'UPDATE rapport_visite SET
                     RAP_DATEVISITE = :date_visite,
                     RAP_BILAN = :bilan,
+                    RAP_MOTIF = :motif,
                     PRA_NUM = :pra_num,
                     PRA_NUM_praticien = :pra_remplacant,
                     MED_DEPOTLEGAL_1 = :med1,
@@ -319,6 +327,11 @@ function updateRapportVisite($data)
         $stmt->bindParam(':num_rapport', $data['num_rapport'], PDO::PARAM_INT);
         $stmt->bindParam(':date_visite', $data['date_visite'], PDO::PARAM_STR);
         $stmt->bindParam(':bilan', $data['bilan'], PDO::PARAM_STR);
+        
+        // Motif - CETTE PARTIE ÉTAIT MANQUANTE
+        $motif = !empty($data['motif']) ? $data['motif'] : null;
+        $stmt->bindParam(':motif', $motif, PDO::PARAM_INT);
+        
         $stmt->bindParam(':pra_num', $data['praticien'], PDO::PARAM_INT);
         
         $pra_remplacant = !empty($data['praticien_remplacant']) ? $data['praticien_remplacant'] : null;
@@ -337,7 +350,7 @@ function updateRapportVisite($data)
         
         $result = $stmt->execute();
         
-        // Mettre à jour le motif
+        // Mettre à jour le motif dans la table motif
         if ($result && !empty($data['motif'])) {
             updateMotifRapport($data['matricule'], $data['num_rapport'], $data['motif']);
         }
