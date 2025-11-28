@@ -22,19 +22,25 @@
                                 '<li class="pb-2">
                                     <i class=\'bx-fw bx bxs-chevron-right bx-xs\'></i><a class="text-decoration-none text-light py-1" href="index.php?uc=medicaments&action=formulairemedoc">Médicaments</a>
                                 </li>
-                                <li class="pb-2">
-                                    <i class=\'bx-fw bx bxs-chevron-right bx-xs\'></i><a class="text-decoration-none text-light py-1" href="index.php?uc=praticien&action=formulairepraticien">Praticiens</a>
+                                <li class="pb-2 dropdown">
+                                    <i class=\'bx-fw bx bxs-chevron-right bx-xs\'></i><a class="text-decoration-none text-light py-1" href="#" id="navbarDarkDropdownMenuLinkPraticien" role="button" data-bs-toggle="dropdown" aria-expanded="false">Praticiens</a>
+                                    <ul class="dropdown-menu dropdown-menu-dark p-0">
+                                        <li><a class="dropdown-item" href="index.php?uc=praticien&action=gererTous">Tous Praticiens</a></li>
+                                        <li><a class="dropdown-item" href="index.php?uc=praticien&action=gererParRegion">Praticien par Région</a></li>
+                                        <li><a class="dropdown-item" href="index.php?uc=praticien&action=ajoutpraticien">Ajouter Praticien</a></li>
+                                    </ul>
                                 </li>
                                 <li class="pb-2 dropdown">
                                     <i class=\'bx-fw bx bxs-chevron-right bx-xs\'></i><a class="text-decoration-none text-light py-1" href="#" id="navbarDarkDropdownMenuLink" role="button" data-bs-toggle="dropdown" aria-expanded="false">Rapport de visite</a>
                                     <ul class="dropdown-menu dropdown-menu-dark p-0">
-                                        <li><a class="dropdown-item" href="index.php?uc=rapportdevisite&action=redigerrapport">Rédiger un rapport</a></li>
-                                        <li><a class="dropdown-item" href="index.php?uc=rapportdevisite&action=mesrapports">Mes rapports</a></li>';
+                                        <li><a class="dropdown-item" href="index.php?uc=rapport&action=saisir">Saisir un rapport</a></li>
+                                        <li><a class="dropdown-item" href="index.php?uc=consultation&action=formulaire">Consulter mes rapports</a></li>';
+                                        
                                 if ($_SESSION['habilitation'] == 2) echo '<li><a class="dropdown-item" href="index.php?uc=rapportdevisite&action=rapportregion">Rapport de ma région</a></li>';
                                 echo '</ul>
                                 </li>
                                 <li class="pb-2">
-                                        <i class="bx-fw bx bxs-chevron-right bx-xs"></i><a class="text-decoration-none text-light py-1" href="index.php?uc=connexion&action=profil">Profil</a>
+                                    <i class="bx-fw bx bxs-chevron-right bx-xs"></i><a class="text-decoration-none text-light py-1" href="index.php?uc=connexion&action=profil">Profil</a>
                                 </li>';
                             } else {
                                 echo
@@ -65,7 +71,5 @@
 
 
 <script src="assets/js/bootstrap.bundle.min.js"></script>
-
 <script src="assets/js/isotope.pkgd.js"></script>
-
 <script src="assets/js/custom.js"></script>

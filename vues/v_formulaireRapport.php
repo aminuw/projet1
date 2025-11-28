@@ -218,7 +218,7 @@
                             }
                             ?>
                         </div>
-                        <button type="button" class="btn btn-sm btn-secondary" onclick="ajouterEchantillon()">
+                        <button type="button" class="btn btn-sm btn-primary" onclick="ajouterEchantillon()">
                             + Ajouter un médicament
                         </button>
                     </div>
@@ -236,7 +236,7 @@
                         <button type="submit" class="btn btn-info text-light px-4">
                             Enregistrer le rapport
                         </button>
-                        <a href="index.php?uc=accueil" class="btn btn-secondary px-4">Annuler</a>
+                        <a href="index.php?uc=accueil" class="btn btn-primary px-4">Annuler</a>
                     </div>
 
                 </form>

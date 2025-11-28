@@ -5,7 +5,7 @@ session_start();
 function connexionPDO() {
     $login = 'root';
     $mdp = '';
-    $bd = 'agnaou_projet1';
+    $bd = 'gsbfusion';
     $serveur = 'localhost:3307';
 
     try {
