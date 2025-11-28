@@ -17,6 +17,8 @@ function getRapportsAvecFiltres($matricule, $dateDebut = null, $dateFin = null, 
         $monPdo = connexionPDO();
         
         // Requête de base
+        // CORRECTION : Le JOIN sur motif_visite était déjà correct ici, 
+        // mais je m'assure que les champs correspondent bien à ta base.
         $req = 'SELECT DISTINCT
                     r.COL_MATRICULE,
                     r.RAP_NUM,
@@ -25,14 +27,14 @@ function getRapportsAvecFiltres($matricule, $dateDebut = null, $dateFin = null, 
                     r.AUTRE_MOTIF,
                     p.PRA_NUM,
                     CONCAT(p.PRA_NOM, " ", p.PRA_PRENOM) as praticien_nom,
-                    m.LIBELLE_MOTIF as motif,
+                    m.MOT_LIBELLE as motif,
                     r.MED_DEPOTLEGAL_1,
                     r.MED_DEPOTLEGAL_2,
                     med1.MED_NOMCOMMERCIAL as med1_nom,
                     med2.MED_NOMCOMMERCIAL as med2_nom
                 FROM rapport_visite r
                 INNER JOIN praticien p ON r.PRA_NUM = p.PRA_NUM
-                LEFT JOIN motif m ON r.COL_MATRICULE = m.COL_MATRICULE AND r.RAP_NUM = m.RAP_NUM
+                LEFT JOIN motif_visite m ON r.RAP_MOTIF = m.MOT_ID
                 LEFT JOIN medicament med1 ON r.MED_DEPOTLEGAL_1 = med1.MED_DEPOTLEGAL
                 LEFT JOIN medicament med2 ON r.MED_DEPOTLEGAL_2 = med2.MED_DEPOTLEGAL
                 WHERE r.RAP_ETAT = "valide"';
@@ -107,6 +109,11 @@ function getDetailRapport($matricule, $numRapport)
     try {
         $monPdo = connexionPDO();
         
+        // CORRECTION IMPORTANTE ICI :
+        // 1. Suppression du JOIN sur l'ancienne table 'motif'
+        // 2. Ajout du JOIN sur 'motif_visite' via RAP_MOTIF
+        // 3. Correction du champ sélectionné : m.MOT_LIBELLE au lieu de m.LIBELLE_MOTIF
+        
         $req = 'SELECT 
                     r.*,
                     CONCAT(p.PRA_NOM, " ", p.PRA_PRENOM) as praticien_nom,
@@ -114,7 +121,7 @@ function getDetailRapport($matricule, $numRapport)
                     p.PRA_CP,
                     p.PRA_VILLE,
                     CONCAT(p2.PRA_NOM, " ", p2.PRA_PRENOM) as remplacant_nom,
-                    m.LIBELLE_MOTIF as motif,
+                    m.MOT_LIBELLE as motif,
                     med1.MED_NOMCOMMERCIAL as med1_nom,
                     med2.MED_NOMCOMMERCIAL as med2_nom,
                     CONCAT(c.COL_NOM, " ", c.COL_PRENOM) as visiteur_nom
@@ -122,7 +129,7 @@ function getDetailRapport($matricule, $numRapport)
                 INNER JOIN praticien p ON r.PRA_NUM = p.PRA_NUM
                 INNER JOIN collaborateur c ON r.COL_MATRICULE = c.COL_MATRICULE
                 LEFT JOIN praticien p2 ON r.PRA_NUM_praticien = p2.PRA_NUM
-                LEFT JOIN motif m ON r.COL_MATRICULE = m.COL_MATRICULE AND r.RAP_NUM = m.RAP_NUM
+                LEFT JOIN motif_visite m ON r.RAP_MOTIF = m.MOT_ID
                 LEFT JOIN medicament med1 ON r.MED_DEPOTLEGAL_1 = med1.MED_DEPOTLEGAL
                 LEFT JOIN medicament med2 ON r.MED_DEPOTLEGAL_2 = med2.MED_DEPOTLEGAL
                 WHERE r.COL_MATRICULE = :matricule 

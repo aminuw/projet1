@@ -211,9 +211,9 @@
 
                 <!-- Bouton retour en bas -->
                 <div class="text-center mb-4">
-                    <button ahref="index.php?uc=consultation&action=formulaire" class="btn btn-primary px-3">
-                        <i class="texte"></i> Retour à la liste des rapports
-                    </button>
+                    <a href="index.php?uc=consultation&action=formulaire" class="btn btn-primary px-3">
+                        <i class="texte"></i> Retour aux filtres
+                    </a>
                 </div>
 
             </div>

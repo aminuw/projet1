@@ -59,6 +59,7 @@ function getAllPraticiensForSelect()
 
 /**
  * Insère un nouveau rapport de visite
+ * CORRIGÉ : Enregistre le motif directement dans la table rapport_visite
  * @return bool true si succès, false sinon
  */
 function insertRapportVisite($data)
@@ -122,61 +123,15 @@ function insertRapportVisite($data)
         
         $result = $stmt->execute();
         
-        // Maintenant on insère le motif dans la table motif séparément
-        if ($result && !empty($data['motif'])) {
-            insertMotifRapport($data['matricule'], $data['num_rapport'], $data['motif']);
-        }
+        // NOTE: J'ai supprimé l'appel à insertMotifRapport ici.
+        // Le motif est déjà inséré juste au-dessus via :motif
         
         return $result;
         
     } catch (PDOException $e) {
         echo "Erreur SQL : " . $e->getMessage();
-        echo '<br>Données : <pre>';
-        print_r($data);
-        echo '</pre>';
+        // echo '<br>Données : <pre>'; print_r($data); echo '</pre>'; // Décommenter pour debug
         die();
-    }
-}
-
-/**
- * Insère le motif d'un rapport dans la table motif
- */
-function insertMotifRapport($matricule, $numRapport, $motifId)
-{
-    try {
-        $monPdo = connexionPDO();
-        
-        // Récupérer le libellé du motif
-        $reqMotif = 'SELECT MOT_LIBELLE FROM motif_visite WHERE MOT_ID = :motif_id';
-        $stmtMotif = $monPdo->prepare($reqMotif);
-        $stmtMotif->bindParam(':motif_id', $motifId, PDO::PARAM_INT);
-        $stmtMotif->execute();
-        $motif = $stmtMotif->fetch();
-        
-        if ($motif) {
-            // Générer un ID unique pour le motif
-            $reqMaxId = 'SELECT COALESCE(MAX(ID_MOTIF), 0) + 1 as next_id FROM motif';
-            $resMaxId = $monPdo->query($reqMaxId);
-            $maxId = $resMaxId->fetch();
-            
-            $req = 'INSERT INTO motif (ID_MOTIF, LIBELLE_MOTIF, RAP_NUM, COL_MATRICULE) 
-                    VALUES (:id, :libelle, :num, :matricule)';
-            
-            $stmt = $monPdo->prepare($req);
-            $stmt->bindParam(':id', $maxId['next_id'], PDO::PARAM_INT);
-            $stmt->bindParam(':libelle', $motif['MOT_LIBELLE'], PDO::PARAM_STR);
-            $stmt->bindParam(':num', $numRapport, PDO::PARAM_INT);
-            $stmt->bindParam(':matricule', $matricule, PDO::PARAM_STR);
-            
-            return $stmt->execute();
-        }
-        
-        return true;
-        
-    } catch (PDOException $e) {
-        // Si erreur, on ne bloque pas l'enregistrement du rapport
-        error_log("Erreur insertion motif : " . $e->getMessage());
-        return false;
     }
 }
 
@@ -278,23 +233,27 @@ function getEchantillonsRapport($matricule, $numRapport)
 }
 
 /**
- * Récupère le motif d'un rapport
+ * Récupère l'id du motif d'un rapport
+ * CORRIGÉ : Lit directement RAP_MOTIF dans la table rapport_visite
  */
 function getMotifRapport($matricule, $numRapport)
 {
     try {
         $monPdo = connexionPDO();
-        $req = 'SELECT m.ID_MOTIF, mv.MOT_ID 
-                FROM motif m
-                LEFT JOIN motif_visite mv ON m.LIBELLE_MOTIF = mv.MOT_LIBELLE
-                WHERE m.COL_MATRICULE = :matricule AND m.RAP_NUM = :num';
+        
+        $req = 'SELECT RAP_MOTIF 
+                FROM rapport_visite 
+                WHERE COL_MATRICULE = :matricule AND RAP_NUM = :num';
         
         $stmt = $monPdo->prepare($req);
         $stmt->bindParam(':matricule', $matricule, PDO::PARAM_STR);
         $stmt->bindParam(':num', $numRapport, PDO::PARAM_INT);
         $stmt->execute();
+        
         $result = $stmt->fetch();
-        return $result ? $result['MOT_ID'] : null;
+        
+        return $result ? $result['RAP_MOTIF'] : null;
+        
     } catch (PDOException $e) {
         print "Erreur !: " . $e->getMessage();
         die();
@@ -303,6 +262,7 @@ function getMotifRapport($matricule, $numRapport)
 
 /**
  * Met à jour un rapport existant
+ * CORRIGÉ : Met à jour directement RAP_MOTIF sans appeler de fonction externe
  */
 function updateRapportVisite($data)
 {
@@ -328,7 +288,6 @@ function updateRapportVisite($data)
         $stmt->bindParam(':date_visite', $data['date_visite'], PDO::PARAM_STR);
         $stmt->bindParam(':bilan', $data['bilan'], PDO::PARAM_STR);
         
-        // Motif - CETTE PARTIE ÉTAIT MANQUANTE
         $motif = !empty($data['motif']) ? $data['motif'] : null;
         $stmt->bindParam(':motif', $motif, PDO::PARAM_INT);
         
@@ -350,11 +309,6 @@ function updateRapportVisite($data)
         
         $result = $stmt->execute();
         
-        // Mettre à jour le motif dans la table motif
-        if ($result && !empty($data['motif'])) {
-            updateMotifRapport($data['matricule'], $data['num_rapport'], $data['motif']);
-        }
-        
         return $result;
         
     } catch (PDOException $e) {
@@ -364,22 +318,24 @@ function updateRapportVisite($data)
 }
 
 /**
- * Met à jour le motif d'un rapport
+ * Met à jour UNIQUEMENT le motif d'un rapport
+ * CORRIGÉ : Simple UPDATE sur rapport_visite
  */
 function updateMotifRapport($matricule, $numRapport, $motifId)
 {
     try {
         $monPdo = connexionPDO();
         
-        // Supprimer l'ancien motif
-        $reqDelete = 'DELETE FROM motif WHERE COL_MATRICULE = :matricule AND RAP_NUM = :num';
-        $stmtDelete = $monPdo->prepare($reqDelete);
-        $stmtDelete->bindParam(':matricule', $matricule, PDO::PARAM_STR);
-        $stmtDelete->bindParam(':num', $numRapport, PDO::PARAM_INT);
-        $stmtDelete->execute();
+        $req = 'UPDATE rapport_visite 
+                SET RAP_MOTIF = :motif 
+                WHERE COL_MATRICULE = :matricule AND RAP_NUM = :num';
+                
+        $stmt = $monPdo->prepare($req);
+        $stmt->bindParam(':matricule', $matricule, PDO::PARAM_STR);
+        $stmt->bindParam(':num', $numRapport, PDO::PARAM_INT);
+        $stmt->bindParam(':motif', $motifId, PDO::PARAM_INT);
         
-        // Insérer le nouveau
-        return insertMotifRapport($matricule, $numRapport, $motifId);
+        return $stmt->execute();
         
     } catch (PDOException $e) {
         error_log("Erreur update motif : " . $e->getMessage());
