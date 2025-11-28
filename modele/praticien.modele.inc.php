@@ -10,9 +10,7 @@ function getAllPraticiens()
         $res = $monPdo->query($req);
         $result = $res->fetchAll();
         return $result;
-    } 
-    
-    catch (PDOException $e) {
+    } catch (PDOException $e) {
         print "Erreur !: " . $e->getMessage();
         die();
     }
@@ -28,8 +26,7 @@ function getPraticienById($id)
         $stmt->execute();
         $result = $stmt->fetch();
         return $result;
-    } 
-    catch (PDOException $e) {
+    } catch (PDOException $e) {
         print "Erreur !: " . $e->getMessage();
         die();
     }
@@ -106,24 +103,28 @@ function addPraticien($pra_num, $pra_prenom, $pra_nom, $pra_adresse, $pra_cp, $p
         $stmt->execute();
 
         if (!empty($spe_code)) {
-
-            $req = 'SELECT COUNT(*) FROM posseder WHERE PRA_NUM = :pra_num AND SPE_CODE = :spe_code';
-            $stmt = $monPdo->prepare($req);
-            $stmt->bindParam(':pra_num', $pra_num, PDO::PARAM_INT);
-            $stmt->bindParam(':spe_code', $spe_code, PDO::PARAM_STR);
-            $stmt->execute();
-            $count = $stmt->fetchColumn();
-
-            if ($count == 0) {
-                $req = 'INSERT INTO posseder (PRA_NUM, SPE_CODE, POS_DIPLOME, POS_COEFPRESCRIPTIO) VALUES (:pra_num, :spe_code, \'DU\', 0.5)';
+            $spe_codes = is_array($spe_code) ? $spe_code : [$spe_code];
+            foreach ($spe_codes as $code) {
+                if (empty($code)) {
+                    continue;
+                }
+                $req = 'SELECT COUNT(*) FROM posseder WHERE PRA_NUM = :pra_num AND SPE_CODE = :spe_code';
                 $stmt = $monPdo->prepare($req);
                 $stmt->bindParam(':pra_num', $pra_num, PDO::PARAM_INT);
-                $stmt->bindParam(':spe_code', $spe_code, PDO::PARAM_STR);
+                $stmt->bindParam(':spe_code', $code, PDO::PARAM_STR);
                 $stmt->execute();
+                $count = $stmt->fetchColumn();
+
+                if ($count == 0) {
+                    $req = 'INSERT INTO posseder (PRA_NUM, SPE_CODE, POS_DIPLOME, POS_COEFPRESCRIPTIO) VALUES (:pra_num, :spe_code, \'DU\', 0.5)';
+                    $stmt = $monPdo->prepare($req);
+                    $stmt->bindParam(':pra_num', $pra_num, PDO::PARAM_INT);
+                    $stmt->bindParam(':spe_code', $code, PDO::PARAM_STR);
+                    $stmt->execute();
+                }
             }
         }
-    } 
-    catch (PDOException $e) {
+    } catch (PDOException $e) {
         print "Erreur !: " . $e->getMessage();
         die();
     }
@@ -224,31 +225,29 @@ function updatePraticien($pra_num, $pra_prenom, $pra_nom, $pra_adresse, $pra_cp,
         $stmt->bindParam(':typ_code', $typ_code, PDO::PARAM_STR);
         $stmt->execute();
 
-        if (!empty($spe_code)) {
-            $req = 'SELECT COUNT(*) FROM posseder WHERE PRA_NUM = :pra_num AND SPE_CODE = :spe_code';
-            $stmt = $monPdo->prepare($req);
-            $stmt->bindParam(':pra_num', $pra_num, PDO::PARAM_INT);
-            $stmt->bindParam(':spe_code', $spe_code, PDO::PARAM_STR);
-            $stmt->execute();
-            $count = $stmt->fetchColumn();
+        $req = 'DELETE FROM posseder WHERE PRA_NUM = :pra_num';
+        $stmt = $monPdo->prepare($req);
+        $stmt->bindParam(':pra_num', $pra_num, PDO::PARAM_INT);
+        $stmt->execute();
 
-            if ($count == 0) {
+        if (!empty($spe_code)) {
+
+            $spe_codes = is_array($spe_code) ? $spe_code : [$spe_code];
+
+            foreach ($spe_codes as $code) {
+                if (empty($code)) {
+                    continue;
+                }
+
                 $req = 'INSERT INTO posseder (PRA_NUM, SPE_CODE, POS_DIPLOME, POS_COEFPRESCRIPTIO) VALUES (:pra_num, :spe_code, \'DU\', 0.5)';
                 $stmt = $monPdo->prepare($req);
                 $stmt->bindParam(':pra_num', $pra_num, PDO::PARAM_INT);
-                $stmt->bindParam(':spe_code', $spe_code, PDO::PARAM_STR);
+                $stmt->bindParam(':spe_code', $code, PDO::PARAM_STR);
                 $stmt->execute();
             }
-        } else {
-            $req = 'DELETE FROM posseder WHERE PRA_NUM = :pra_num';
-            $stmt = $monPdo->prepare($req);
-            $stmt->bindParam(':pra_num', $pra_num, PDO::PARAM_INT);
-            $stmt->execute();
         }
-    } 
-    catch (PDOException $e) {
+    } catch (PDOException $e) {
         print "Erreur !: " . $e->getMessage();
         die();
     }
 }
-
