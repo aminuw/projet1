@@ -155,8 +155,7 @@ function getRegionByLoginId($loginId)
 
         $result = $stmt->fetch(PDO::FETCH_ASSOC);
         return $result ? $result['region_code'] : null;
-    } 
-    catch (PDOException $e) {
+    } catch (PDOException $e) {
         die("Erreur SQL (getRegionByLoginId) : " . $e->getMessage());
     }
 }
@@ -214,17 +213,17 @@ function setAllLogin($a,$i){
     $monPdo = connexionPDO();
         $id=$i+1;
         //echo 'Id : '.$a[$i][0].' | Login : '.concatLogin($a[$i][0]).' | Mot de passe : '.concatMotDePasseBrut($a[$i][0]).'</br>';
-        
+
         $req = 'INSERT INTO login VALUES('.$id.',"'.concatLogin($a[$i][0]).'","'.hash('sha512', concatMotDePasseBrut($a[$i][0])).'","'.$a[$i][0].'"); UPDATE collaborateur SET LOG_ID='.$id.' WHERE COL_MATRICULE="'.$a[$i][0].'"' ;
         $res = $monPdo->query($req);
-    
+
 
 }
 function setAllHabil($a,$id,$i){
     $monPdo = connexionPDO();
         $req = 'UPDATE collaborateur SET HAB_ID='.$id.' WHERE COL_MATRICULE="'.$a[$i][0].'"' ;
         $res = $monPdo->query($req);
-    
+
 
 }
 function getIdMedoc(){

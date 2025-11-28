@@ -2,9 +2,9 @@
 include_once("modele/praticien.modele.inc.php");
 
 if (!isset($_REQUEST['action']) || empty($_REQUEST['action'])) {
-	$action = "formulairepraticien";
+    $action = "formulairepraticien";
 } else {
-	$action = $_REQUEST['action'];
+    $action = $_REQUEST['action'];
 }
 switch ($action) {
     case 'gererParRegion': {
@@ -54,6 +54,14 @@ switch ($action) {
             $pra_coefnotoriete = $_POST['pra_coefnotoriete'];
             $typ_code = isset($_POST['typ_code']) ? $_POST['typ_code'] : '';
             $spe_code = isset($_POST['spe_code']) ? $_POST['spe_code'] : '';
+
+            // Validation: le coefficient de notoriété doit être positif
+            if ($pra_coefnotoriete < 0) {
+                $_SESSION['erreur_message'] = 'Le coefficient de notoriété doit être un nombre positif.';
+                $_SESSION['form_data'] = $_POST;
+                header('Location: index.php?uc=praticien&action=ajoutpraticien');
+                exit();
+            }
 
             if (empty($typ_code) && !isset($_GET['confirm_type'])) {
                 $_SESSION["confirmation_message"] = "Le type de praticien n'a pas été renseigné. Voulez-vous continuer ?";
@@ -124,6 +132,14 @@ switch ($action) {
             $pra_coefnotoriete = $_POST['pra_coefnotoriete'];
             $typ_code = isset($_POST['typ_code']) ? $_POST['typ_code'] : '';
             $spe_code = isset($_POST['spe_code']) ? $_POST['spe_code'] : '';
+
+            // Validation: le coefficient de notoriété doit être positif
+            if ($pra_coefnotoriete < 0) {
+                $_SESSION['erreur_message'] = 'Le coefficient de notoriété doit être un nombre positif.';
+                $_SESSION['form_data'] = $_POST;
+                header('Location: index.php?uc=praticien&action=modifierpraticien&praticien=' . $pra_num);
+                exit();
+            }
 
             if (empty($typ_code) && !isset($_GET['confirm_type'])) {
                 $_SESSION["confirmation_message"] = "Le type de praticien n'a pas été renseigné. Voulez-vous continuer ?";

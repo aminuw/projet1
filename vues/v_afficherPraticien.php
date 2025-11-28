@@ -18,7 +18,7 @@
                         <p><span class="carac">Prénom</span> : <?php echo $infos['Prenom']; ?></p>
                         <p><span class="carac">Adresse</span> : <?php echo $infos['Adresse']; ?></p>
                         <p><span class="carac">Coefficient de notoriété</span> : <?php echo $infos['Telephone']; ?></p>
-                        <p><span class="carac">Spécialité</span> : <?php echo !empty($specialite) ? implode(', ', $specialite) : 'Non spécifiée'; ?></p>
+                        <p><span class="carac">Spécialité</span> : <?php if(!empty($specialite)) { echo implode(', ', $specialite); } else { echo 'aucun'; } ?></p>
                         <p><span class="carac">Département</span> : <?php echo $infos['Departement']; ?></p>
                         <p><span class="carac">Type Praticien</span> : <?php echo $praticien['TYP_CODE']; ?></p>
 

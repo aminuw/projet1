@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Hôte : 127.0.0.1:3307
--- Généré le : mar. 14 oct. 2025 à 09:51
+-- Généré le : mar. 25 nov. 2025 à 07:40
 -- Version du serveur : 11.5.2-MariaDB
 -- Version de PHP : 8.3.14
 
@@ -478,6 +478,45 @@ CREATE TABLE IF NOT EXISTS `motif` (
   KEY `FK_MOTIF_RAPPORT` (`COL_MATRICULE`,`RAP_NUM`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_bin;
 
+--
+-- Déchargement des données de la table `motif`
+--
+
+INSERT INTO `motif` (`ID_MOTIF`, `LIBELLE_MOTIF`, `RAP_NUM`, `COL_MATRICULE`) VALUES
+(1, 'Nouveauté ou actualisation', 4, 'a131'),
+(2, 'Nouveauté ou actualisation', 3, 'a131'),
+(3, 'Périodicité', 5, 'a131'),
+(5, 'Autre', 1, 'a131'),
+(6, 'Autre', 6, 'a131'),
+(9, 'Autre', 2, 'a131'),
+(10, 'Périodicité', 7, 'a131'),
+(11, 'Autre', 9, 'a131'),
+(12, 'Autre', 8, 'a131');
+
+-- --------------------------------------------------------
+
+--
+-- Structure de la table `motif_visite`
+--
+
+DROP TABLE IF EXISTS `motif_visite`;
+CREATE TABLE IF NOT EXISTS `motif_visite` (
+  `MOT_ID` int(11) NOT NULL AUTO_INCREMENT,
+  `MOT_LIBELLE` varchar(100) NOT NULL,
+  PRIMARY KEY (`MOT_ID`)
+) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_bin;
+
+--
+-- Déchargement des données de la table `motif_visite`
+--
+
+INSERT INTO `motif_visite` (`MOT_ID`, `MOT_LIBELLE`) VALUES
+(1, 'Périodicité'),
+(2, 'Nouveauté ou actualisation'),
+(3, 'Remontage (baisse de prescription)'),
+(4, 'Sollicitation du médecin'),
+(5, 'Autre');
+
 -- --------------------------------------------------------
 
 --
@@ -494,6 +533,15 @@ CREATE TABLE IF NOT EXISTS `offrir` (
   UNIQUE KEY `idx_med_depotlegal` (`MED_DEPOTLEGAL`),
   KEY `FK_offrir_rapport` (`COL_MATRICULE`,`RAP_NUM`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
+
+--
+-- Déchargement des données de la table `offrir`
+--
+
+INSERT INTO `offrir` (`OFF_QTE`, `MED_DEPOTLEGAL`, `RAP_NUM`, `COL_MATRICULE`) VALUES
+(5, 'INSXT5', 4, 'a131'),
+(10, 'JOVAI8', 9, 'a131'),
+(1, 'LIDOXY23', 4, 'a131');
 
 -- --------------------------------------------------------
 
@@ -707,6 +755,7 @@ CREATE TABLE IF NOT EXISTS `rapport_visite` (
   `MED_DEPOTLEGAL_1` varchar(10) DEFAULT NULL,
   `MED_DEPOTLEGAL_2` varchar(10) DEFAULT NULL,
   `AUTRE_MOTIF` varchar(50) NOT NULL,
+  `RAP_ETAT` varchar(20) DEFAULT 'en_cours',
   PRIMARY KEY (`COL_MATRICULE`,`RAP_NUM`),
   KEY `rapport_visite_praticien2_FK` (`PRA_NUM`),
   KEY `FK_Rapport_Med1_unique` (`MED_DEPOTLEGAL_1`),
@@ -719,11 +768,16 @@ CREATE TABLE IF NOT EXISTS `rapport_visite` (
 -- Déchargement des données de la table `rapport_visite`
 --
 
-INSERT INTO `rapport_visite` (`COL_MATRICULE`, `RAP_NUM`, `RAP_DATEVISITE`, `RAP_BILAN`, `RAP_MOTIF`, `PRA_NUM`, `PRA_NUM_praticien`, `MED_DEPOTLEGAL_1`, `MED_DEPOTLEGAL_2`, `AUTRE_MOTIF`) VALUES
-('a131', 1, '2002-04-18', 'Médecin curieux, à recontacter en décembre pour réunion.', NULL, 23, NULL, '', NULL, ''),
-('a131', 2, '2003-03-23', 'RAS.\r\nChangement de tel : 05 89 89 89 89.', NULL, 41, NULL, '', NULL, ''),
-('a131', 3, '2021-12-03', 'Médecin énervé, ancien boxeur !', NULL, 7, NULL, '', NULL, ''),
-('a17', 1, '2003-05-21', 'Changement de direction, redéfinition de la politique médicamenteuse, recours au générique.', NULL, 4, NULL, '', NULL, '');
+INSERT INTO `rapport_visite` (`COL_MATRICULE`, `RAP_NUM`, `RAP_DATEVISITE`, `RAP_BILAN`, `RAP_MOTIF`, `PRA_NUM`, `PRA_NUM_praticien`, `MED_DEPOTLEGAL_1`, `MED_DEPOTLEGAL_2`, `AUTRE_MOTIF`, `RAP_ETAT`) VALUES
+('a131', 1, '2002-04-18', 'Médecin curieux, à recontacter en décembre pour réunion.', NULL, 23, NULL, NULL, NULL, 'azeazea', 'valide'),
+('a131', 2, '2003-03-23', 'RAS.\r\nChangement de tel : 05 89 89 89 89.', 5, 41, NULL, NULL, NULL, 'azea', 'valide'),
+('a131', 3, '2021-12-03', 'Médecin énervé, ancien boxeur !', NULL, 7, NULL, NULL, NULL, '', 'valide'),
+('a131', 4, '2025-10-25', 'aaaaaaaaaaaaaaaaaaa', NULL, 41, NULL, 'LIDOXY23', 'INSXT5', '', 'valide'),
+('a131', 5, '2025-10-28', 'test', NULL, 15, NULL, 'BACTIV13', NULL, '', 'valide'),
+('a131', 6, '2025-11-04', 'test', NULL, 41, 81, 'EQUILARX6', NULL, 'Malade', 'valide'),
+('a131', 7, '2025-11-17', 'azeeeeee', 1, 81, NULL, NULL, NULL, '', 'valide'),
+('a131', 8, '2025-11-11', 'aze', 5, 41, NULL, NULL, NULL, 'aa', 'en_cours'),
+('a131', 9, '2025-11-18', 'azer', 5, 81, NULL, NULL, NULL, 'aaaaaaaa', 'valide');
 
 -- --------------------------------------------------------
 
