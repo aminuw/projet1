@@ -4,21 +4,13 @@ include_once 'bd.inc.php';
 
 /**
  * Récupère tous les rapports de visite avec filtres
- * @param string $matricule - Matricule du visiteur
- * @param string $dateDebut - Date de début (optionnel)
- * @param string $dateFin - Date de fin (optionnel)  
- * @param int $praticien - Numéro du praticien (optionnel)
- * @param string $region - Code région pour délégué (optionnel)
- * @return array - Liste des rapports
+ * MODIFIÉ : Filtre sur ETAT_CODE = 2 (Validé) au lieu de RAP_ETAT = "valide"
  */
 function getRapportsAvecFiltres($matricule, $dateDebut = null, $dateFin = null, $praticien = null, $region = null)
 {
     try {
         $monPdo = connexionPDO();
         
-        // Requête de base
-        // CORRECTION : Le JOIN sur motif_visite était déjà correct ici, 
-        // mais je m'assure que les champs correspondent bien à ta base.
         $req = 'SELECT DISTINCT
                     r.COL_MATRICULE,
                     r.RAP_NUM,
@@ -31,13 +23,15 @@ function getRapportsAvecFiltres($matricule, $dateDebut = null, $dateFin = null, 
                     r.MED_DEPOTLEGAL_1,
                     r.MED_DEPOTLEGAL_2,
                     med1.MED_NOMCOMMERCIAL as med1_nom,
-                    med2.MED_NOMCOMMERCIAL as med2_nom
+                    med2.MED_NOMCOMMERCIAL as med2_nom,
+                    e.ETAT_LIBELLE 
                 FROM rapport_visite r
                 INNER JOIN praticien p ON r.PRA_NUM = p.PRA_NUM
                 LEFT JOIN motif_visite m ON r.RAP_MOTIF = m.MOT_ID
                 LEFT JOIN medicament med1 ON r.MED_DEPOTLEGAL_1 = med1.MED_DEPOTLEGAL
                 LEFT JOIN medicament med2 ON r.MED_DEPOTLEGAL_2 = med2.MED_DEPOTLEGAL
-                WHERE r.RAP_ETAT = "valide"';
+                LEFT JOIN etat e ON r.ETAT_CODE = e.ETAT_CODE
+                WHERE r.ETAT_CODE = 1'; // CORRECTION ICI : 2 = Validé
         
         // Filtres selon le rôle
         if (!empty($region)) {
@@ -103,16 +97,12 @@ function getRapportsAvecFiltres($matricule, $dateDebut = null, $dateFin = null, 
 
 /**
  * Récupère le détail complet d'un rapport de visite
+ * AJOUT : Jointure avec la table ETAT pour récupérer le libellé
  */
 function getDetailRapport($matricule, $numRapport)
 {
     try {
         $monPdo = connexionPDO();
-        
-        // CORRECTION IMPORTANTE ICI :
-        // 1. Suppression du JOIN sur l'ancienne table 'motif'
-        // 2. Ajout du JOIN sur 'motif_visite' via RAP_MOTIF
-        // 3. Correction du champ sélectionné : m.MOT_LIBELLE au lieu de m.LIBELLE_MOTIF
         
         $req = 'SELECT 
                     r.*,
@@ -124,7 +114,8 @@ function getDetailRapport($matricule, $numRapport)
                     m.MOT_LIBELLE as motif,
                     med1.MED_NOMCOMMERCIAL as med1_nom,
                     med2.MED_NOMCOMMERCIAL as med2_nom,
-                    CONCAT(c.COL_NOM, " ", c.COL_PRENOM) as visiteur_nom
+                    CONCAT(c.COL_NOM, " ", c.COL_PRENOM) as visiteur_nom,
+                    e.ETAT_LIBELLE
                 FROM rapport_visite r
                 INNER JOIN praticien p ON r.PRA_NUM = p.PRA_NUM
                 INNER JOIN collaborateur c ON r.COL_MATRICULE = c.COL_MATRICULE
@@ -132,6 +123,7 @@ function getDetailRapport($matricule, $numRapport)
                 LEFT JOIN motif_visite m ON r.RAP_MOTIF = m.MOT_ID
                 LEFT JOIN medicament med1 ON r.MED_DEPOTLEGAL_1 = med1.MED_DEPOTLEGAL
                 LEFT JOIN medicament med2 ON r.MED_DEPOTLEGAL_2 = med2.MED_DEPOTLEGAL
+                LEFT JOIN etat e ON r.ETAT_CODE = e.ETAT_CODE
                 WHERE r.COL_MATRICULE = :matricule 
                 AND r.RAP_NUM = :num';
         

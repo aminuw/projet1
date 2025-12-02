@@ -1,5 +1,5 @@
 <?php
-include_once("modele/rapport.modele.inc.php");
+include_once("modele/rapport.modele.inc.php"); // Ou 'bd.inc.php' selon ton arborescence
 
 if (!isset($_REQUEST['action']) || empty($_REQUEST['action'])) {
     $action = "saisir";
@@ -12,7 +12,7 @@ switch ($action) {
     case 'saisir': {
         // Récupérer les données nécessaires pour le formulaire
         $praticiens = getAllPraticiensForSelect();
-        $medicaments = getAllNomMedicament();
+        // $medicaments = getAllNomMedicament(); // Assure-toi que cette fonction existe dans ton modèle
         $motifs = getAllMotifs();
         
         // Récupérer les rapports en cours du visiteur
@@ -46,8 +46,10 @@ switch ($action) {
             exit();
         }
         
-        // Vérifier que le rapport est bien en cours
-        if ($rapportEnCours['RAP_ETAT'] != 'en_cours') {
+        // --- CORRECTION ICI : On vérifie le code (1 = en cours) ---
+        // On vérifie que le rapport est bien en cours
+        // Si ETAT_CODE est différent de 1, alors il est validé (2) ou archivé
+        if ($rapportEnCours['ETAT_CODE'] != 1) {
             $_SESSION['erreurs'] = array("Ce rapport a déjà été validé et ne peut plus être modifié");
             header('Location: index.php?uc=rapport&action=saisir');
             exit();
@@ -55,7 +57,7 @@ switch ($action) {
         
         // Récupérer les données complémentaires
         $praticiens = getAllPraticiensForSelect();
-        $medicaments = getAllNomMedicament();
+        // $medicaments = getAllNomMedicament();
         $motifs = getAllMotifs();
         $rapportsEnCours = getRapportsEnCours($_SESSION['matricule']);
         $echantillons = getEchantillonsRapport($_SESSION['matricule'], $numRapport);
@@ -97,7 +99,7 @@ switch ($action) {
         if (empty($_POST['motif'])) {
             $erreurs[] = "Le motif de la visite est obligatoire";
         } else {
-            // Vérification motif "Autre"
+            // Vérification motif "Autre" (Code 5)
             if ($_POST['motif'] == '5') {
                 if (empty($_POST['autre_motif']) || trim($_POST['autre_motif']) == '') {
                     $erreurs[] = "Veuillez saisir le motif autre";
@@ -123,15 +125,13 @@ switch ($action) {
             
             // Avertissement si pas de médicament présenté
             if (empty($_POST['medicament1']) && empty($_POST['medicament2'])) {
-                // Si pas de confirmation, on demande (sauf si c'est une resoumission après confirmation)
                 if (!isset($_POST['confirm_no_med']) && !isset($_POST['num_rapport_existant'])) {
                     $_SESSION['avertissement_type'] = 'medicament';
                     $_SESSION['avertissement'] = "Aucun médicament n'a été présenté lors de cette visite. Confirmez-vous ?";
-                    $_SESSION['data_rapport'] = $_POST; // Sauvegarder les données
+                    $_SESSION['data_rapport'] = $_POST; 
                     header('Location: index.php?uc=rapport&action=confirmer');
                     exit();
                 } elseif ($isUpdate && !isset($_POST['confirm_no_med'])) {
-                    // Pour les modifications, toujours demander confirmation
                     $_SESSION['avertissement_type'] = 'medicament';
                     $_SESSION['avertissement'] = "Aucun médicament n'a été présenté lors de cette visite. Confirmez-vous ?";
                     $_SESSION['data_rapport'] = $_POST;
@@ -152,15 +152,13 @@ switch ($action) {
             }
             
             if (!$hasEchantillons) {
-                // Si pas de confirmation, on demande
                 if (!isset($_POST['confirm_no_ech']) && !isset($_POST['num_rapport_existant'])) {
                     $_SESSION['avertissement_type'] = 'echantillon';
                     $_SESSION['avertissement'] = "Aucun échantillon n'a été offert lors de cette visite. Confirmez-vous ?";
-                    $_SESSION['data_rapport'] = $_POST; // Sauvegarder les données
+                    $_SESSION['data_rapport'] = $_POST; 
                     header('Location: index.php?uc=rapport&action=confirmer');
                     exit();
                 } elseif ($isUpdate && !isset($_POST['confirm_no_ech'])) {
-                    // Pour les modifications, toujours demander confirmation
                     $_SESSION['avertissement_type'] = 'echantillon';
                     $_SESSION['avertissement'] = "Aucun échantillon n'a été offert lors de cette visite. Confirmez-vous ?";
                     $_SESSION['data_rapport'] = $_POST;
@@ -170,7 +168,7 @@ switch ($action) {
             }
         }
         
-        // --- SI ERREURS ET PAS DE SAISIE DÉFINITIVE : Autoriser l'enregistrement en cours ---
+        // --- SI ERREURS ET PAS DE SAISIE DÉFINITIVE ---
         if (!empty($erreurs) && !$saisieDefinitive) {
             $_SESSION['avertissements'] = $erreurs;
             $_SESSION['avertissements'][] = "Rapport enregistré en cours de saisie avec des champs manquants";
@@ -178,8 +176,9 @@ switch ($action) {
         
         // --- ENREGISTREMENT EN BASE DE DONNÉES ---
         
-        // Déterminer l'état du rapport
-        $etat = $saisieDefinitive ? 'valide' : 'en_cours';
+        // --- CORRECTION ICI : On utilise les codes entiers ---
+        // 2 = Validé, 1 = En cours
+        $etat = $saisieDefinitive ? 2 : 1;
         
         // Déterminer le numéro de rapport
         if ($isUpdate) {
@@ -200,7 +199,7 @@ switch ($action) {
             'medicament1' => $_POST['medicament1'] ?? null,
             'medicament2' => $_POST['medicament2'] ?? null,
             'autre_motif' => $_POST['autre_motif'] ?? '',
-            'etat' => $etat
+            'etat' => $etat // On passe l'entier (1 ou 2)
         );
         
         // Insertion ou mise à jour du rapport
@@ -229,15 +228,15 @@ switch ($action) {
                 }
             }
             
-            // Message de succès selon l'état
+            // --- CORRECTION ICI : Messages basés sur l'entier 2 (Validé) ---
             if ($isUpdate) {
-                if ($etat == 'valide') {
+                if ($etat == 2) {
                     $_SESSION['succes'] = "Rapport de visite n°" . $numRapport . " mis à jour et validé avec succès !";
                 } else {
                     $_SESSION['succes'] = "Rapport de visite n°" . $numRapport . " mis à jour (toujours en cours de saisie).";
                 }
             } else {
-                if ($etat == 'valide') {
+                if ($etat == 2) {
                     $_SESSION['succes'] = "Rapport de visite n°" . $numRapport . " enregistré avec succès et validé !";
                 } else {
                     $_SESSION['succes'] = "Rapport de visite n°" . $numRapport . " enregistré en cours de saisie.";
