@@ -59,14 +59,20 @@ function getAllPraticiensForSelect()
 
 /**
  * Insère un nouveau rapport de visite
- * CORRIGÉ : Enregistre le motif directement dans la table rapport_visite
- * @return bool true si succès, false sinon
+ * MODIFIÉ : Utilise ETAT_CODE (Int) au lieu de RAP_ETAT (String)
  */
 function insertRapportVisite($data)
 {
     try {
         $monPdo = connexionPDO();
         
+        // On détermine le code état (1 = En cours, 2 = Validé)
+        // On vérifie si l'entrée est 'valide' (string) ou 2 (int)
+        $etatCode = 1; // Par défaut "En cours"
+        if (isset($data['etat']) && ($data['etat'] === 'valide' || $data['etat'] == 2)) {
+            $etatCode = 2;
+        }
+
         $req = 'INSERT INTO rapport_visite (
                     COL_MATRICULE, 
                     RAP_NUM, 
@@ -78,7 +84,7 @@ function insertRapportVisite($data)
                     MED_DEPOTLEGAL_1, 
                     MED_DEPOTLEGAL_2, 
                     AUTRE_MOTIF,
-                    RAP_ETAT
+                    ETAT_CODE
                 ) VALUES (
                     :matricule,
                     :num_rapport,
@@ -90,7 +96,7 @@ function insertRapportVisite($data)
                     :med1,
                     :med2,
                     :autre_motif,
-                    :etat
+                    :etat_code
                 )';
         
         $stmt = $monPdo->prepare($req);
@@ -100,13 +106,11 @@ function insertRapportVisite($data)
         $stmt->bindParam(':date_visite', $data['date_visite'], PDO::PARAM_STR);
         $stmt->bindParam(':bilan', $data['bilan'], PDO::PARAM_STR);
         
-        // Motif
         $motif = !empty($data['motif']) ? $data['motif'] : null;
         $stmt->bindParam(':motif', $motif, PDO::PARAM_INT);
         
         $stmt->bindParam(':pra_num', $data['praticien'], PDO::PARAM_INT);
         
-        // Paramètres optionnels
         $pra_remplacant = !empty($data['praticien_remplacant']) ? $data['praticien_remplacant'] : null;
         $stmt->bindParam(':pra_remplacant', $pra_remplacant, PDO::PARAM_INT);
         
@@ -119,18 +123,15 @@ function insertRapportVisite($data)
         $autre_motif = !empty($data['autre_motif']) ? $data['autre_motif'] : '';
         $stmt->bindParam(':autre_motif', $autre_motif, PDO::PARAM_STR);
         
-        $stmt->bindParam(':etat', $data['etat'], PDO::PARAM_STR);
+        // ICI : On bind l'entier
+        $stmt->bindParam(':etat_code', $etatCode, PDO::PARAM_INT);
         
         $result = $stmt->execute();
-        
-        // NOTE: J'ai supprimé l'appel à insertMotifRapport ici.
-        // Le motif est déjà inséré juste au-dessus via :motif
         
         return $result;
         
     } catch (PDOException $e) {
         echo "Erreur SQL : " . $e->getMessage();
-        // echo '<br>Données : <pre>'; print_r($data); echo '</pre>'; // Décommenter pour debug
         die();
     }
 }
@@ -165,15 +166,17 @@ function insertEchantillons($matricule, $numRapport, $echantillons)
 
 /**
  * Récupère tous les rapports en cours de saisie d'un visiteur
+ * MODIFIÉ : Filtre sur ETAT_CODE = 1 (En cours)
  */
 function getRapportsEnCours($matricule)
 {
     try {
         $monPdo = connexionPDO();
+        // Ici on remplace RAP_ETAT = "en_cours" par ETAT_CODE = 1
         $req = 'SELECT r.RAP_NUM, r.RAP_DATEVISITE, CONCAT(p.PRA_NOM, " ", p.PRA_PRENOM) as praticien
                 FROM rapport_visite r
                 INNER JOIN praticien p ON r.PRA_NUM = p.PRA_NUM
-                WHERE r.COL_MATRICULE = :matricule AND r.RAP_ETAT = "en_cours"
+                WHERE r.COL_MATRICULE = :matricule AND r.ETAT_CODE = 1
                 ORDER BY r.RAP_NUM DESC';
         
         $stmt = $monPdo->prepare($req);
@@ -188,7 +191,7 @@ function getRapportsEnCours($matricule)
 }
 
 /**
- * Récupère un rapport spécifique (pour modification)
+ * Récupère un rapport spécifique
  */
 function getRapportById($matricule, $numRapport)
 {
@@ -234,13 +237,11 @@ function getEchantillonsRapport($matricule, $numRapport)
 
 /**
  * Récupère l'id du motif d'un rapport
- * CORRIGÉ : Lit directement RAP_MOTIF dans la table rapport_visite
  */
 function getMotifRapport($matricule, $numRapport)
 {
     try {
         $monPdo = connexionPDO();
-        
         $req = 'SELECT RAP_MOTIF 
                 FROM rapport_visite 
                 WHERE COL_MATRICULE = :matricule AND RAP_NUM = :num';
@@ -251,7 +252,6 @@ function getMotifRapport($matricule, $numRapport)
         $stmt->execute();
         
         $result = $stmt->fetch();
-        
         return $result ? $result['RAP_MOTIF'] : null;
         
     } catch (PDOException $e) {
@@ -262,13 +262,19 @@ function getMotifRapport($matricule, $numRapport)
 
 /**
  * Met à jour un rapport existant
- * CORRIGÉ : Met à jour directement RAP_MOTIF sans appeler de fonction externe
+ * MODIFIÉ : Utilise ETAT_CODE au lieu de RAP_ETAT
  */
 function updateRapportVisite($data)
 {
     try {
         $monPdo = connexionPDO();
         
+        // Conversion de l'état en entier pour la BDD
+        $etatCode = 1; // Default "En cours"
+        if (isset($data['etat']) && ($data['etat'] === 'valide' || $data['etat'] == 2)) {
+            $etatCode = 2;
+        }
+
         $req = 'UPDATE rapport_visite SET
                     RAP_DATEVISITE = :date_visite,
                     RAP_BILAN = :bilan,
@@ -278,7 +284,7 @@ function updateRapportVisite($data)
                     MED_DEPOTLEGAL_1 = :med1,
                     MED_DEPOTLEGAL_2 = :med2,
                     AUTRE_MOTIF = :autre_motif,
-                    RAP_ETAT = :etat
+                    ETAT_CODE = :etat_code
                 WHERE COL_MATRICULE = :matricule AND RAP_NUM = :num_rapport';
         
         $stmt = $monPdo->prepare($req);
@@ -305,7 +311,8 @@ function updateRapportVisite($data)
         $autre_motif = !empty($data['autre_motif']) ? $data['autre_motif'] : '';
         $stmt->bindParam(':autre_motif', $autre_motif, PDO::PARAM_STR);
         
-        $stmt->bindParam(':etat', $data['etat'], PDO::PARAM_STR);
+        // ICI : Update avec l'int
+        $stmt->bindParam(':etat_code', $etatCode, PDO::PARAM_INT);
         
         $result = $stmt->execute();
         
@@ -319,13 +326,11 @@ function updateRapportVisite($data)
 
 /**
  * Met à jour UNIQUEMENT le motif d'un rapport
- * CORRIGÉ : Simple UPDATE sur rapport_visite
  */
 function updateMotifRapport($matricule, $numRapport, $motifId)
 {
     try {
         $monPdo = connexionPDO();
-        
         $req = 'UPDATE rapport_visite 
                 SET RAP_MOTIF = :motif 
                 WHERE COL_MATRICULE = :matricule AND RAP_NUM = :num';
