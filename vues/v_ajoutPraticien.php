@@ -25,7 +25,13 @@
                         <form action="index.php?uc=praticien&action=valideAjout&<?php echo http_build_query($_GET); ?>"
                             method="post">
                             <?php foreach ($form_data as $key => $value): ?>
-                                <input type="hidden" name="<?php echo $key; ?>" value="<?php echo htmlspecialchars($value); ?>">
+                                <?php if (is_array($value)): ?>
+                                    <?php foreach ($value as $item): ?>
+                                        <input type="hidden" name="<?php echo $key; ?>[]" value="<?php echo htmlspecialchars($item); ?>">
+                                    <?php endforeach; ?>
+                                <?php else: ?>
+                                    <input type="hidden" name="<?php echo $key; ?>" value="<?php echo htmlspecialchars($value); ?>">
+                                <?php endif; ?>
                             <?php endforeach; ?>
                             <button type="submit" class="btn btn-success">Oui</button>
                             <a href="index.php?uc=praticien&action=ajoutpraticien" class="btn btn-danger">Non</a>

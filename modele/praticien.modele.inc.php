@@ -152,8 +152,8 @@ function getPraticienSpecialty($id)
         $stmt = $monPdo->prepare($req);
         $stmt->bindParam(':id', $id, PDO::PARAM_INT);
         $stmt->execute();
-        $result = $stmt->fetch();
-        return $result ? $result['SPE_CODE'] : null;
+        $results = $stmt->fetchAll(PDO::FETCH_COLUMN);
+        return $results ? $results : [];
     } catch (PDOException $e) {
         print "Erreur !: " . $e->getMessage();
         die();

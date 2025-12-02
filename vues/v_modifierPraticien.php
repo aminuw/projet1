@@ -26,7 +26,13 @@ if (isset($_SESSION['form_data'])) {
                             action="index.php?uc=praticien&action=valideModification&praticien=<?php echo $praticien['PRA_NUM']; ?>&<?php echo http_build_query($_GET); ?>"
                             method="post">
                             <?php foreach ($form_data as $key => $value): ?>
-                                <input type="hidden" name="<?php echo $key; ?>" value="<?php echo htmlspecialchars($value); ?>">
+                                <?php if (is_array($value)): ?>
+                                    <?php foreach ($value as $item): ?>
+                                        <input type="hidden" name="<?php echo $key; ?>[]" value="<?php echo htmlspecialchars($item); ?>">
+                                    <?php endforeach; ?>
+                                <?php else: ?>
+                                    <input type="hidden" name="<?php echo $key; ?>" value="<?php echo htmlspecialchars($value); ?>">
+                                <?php endif; ?>
                             <?php endforeach; ?>
                             <button type="submit" class="btn btn-success">Oui</button>
                             <a href="index.php?uc=praticien&action=modifierpraticien&praticien=<?php echo $praticien['PRA_NUM']; ?>"
@@ -84,13 +90,31 @@ if (isset($_SESSION['form_data'])) {
                         </select>
                     </div>
                     <div class="form-group">
-                        <label for="spe_code">Spécialité</label>
-                        <select class="form-control" id="spe_code" name="spe_code">
-                            <option value="">Aucune</option>
-                            <?php foreach ($lesSpecialites as $specialite) { ?>
-                                <option value="<?php echo $specialite['SPE_CODE']; ?>" <?php echo (isset($form_data['SPE_CODE']) && $form_data['SPE_CODE'] == $specialite['SPE_CODE']) ? 'selected' : ''; ?>><?php echo $specialite['SPE_LIBELLE']; ?></option>
+                        <label>Spécialités</label>
+                        <div class="specialites-checkboxes" style="border: 1px solid #ced4da; border-radius: 0.25rem; padding: 10px; max-height: 200px; overflow-y: auto;">
+                            <?php 
+                            // Récupérer les spécialités actuelles du praticien
+                            $specialites_actuelles = isset($form_data['SPE_CODE']) && is_array($form_data['SPE_CODE']) 
+                                ? $form_data['SPE_CODE'] 
+                                : (isset($praticien['SPE_CODE']) && is_array($praticien['SPE_CODE']) 
+                                    ? $praticien['SPE_CODE'] 
+                                    : []);
+                            
+                            foreach ($lesSpecialites as $specialite) { 
+                                $is_checked = in_array($specialite['SPE_CODE'], $specialites_actuelles);
+                            ?>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" 
+                                           name="spe_code[]" 
+                                           value="<?php echo $specialite['SPE_CODE']; ?>" 
+                                           id="spe_<?php echo $specialite['SPE_CODE']; ?>"
+                                           <?php echo $is_checked ? 'checked' : ''; ?>>
+                                    <label class="form-check-label" for="spe_<?php echo $specialite['SPE_CODE']; ?>">
+                                        <?php echo $specialite['SPE_LIBELLE']; ?>
+                                    </label>
+                                </div>
                             <?php } ?>
-                        </select>
+                        </div>
                     </div>
                     
                     <button type="submit" class="btn btn-primary">Modifier</button>
