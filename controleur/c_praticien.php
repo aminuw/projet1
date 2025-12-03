@@ -1,5 +1,6 @@
-<?php
+﻿<?php
 include_once("modele/praticien.modele.inc.php");
+include_once("modele/habilitation.modele.inc.php");
 
 if (!isset($_REQUEST['action']) || empty($_REQUEST['action'])) {
     $action = "formulairepraticien";
@@ -19,6 +20,7 @@ switch ($action) {
         $loginId = $_SESSION['login'];
         $region = getRegionByLoginId($loginId);
         $praticiens = getAllPraticiensByRegion($region);
+        $name= "(Par Region)";
         include("vues/v_formulairePraticien.php");
         break;
     }
@@ -32,6 +34,7 @@ switch ($action) {
         }
 
         $praticiens = getAllPraticiens();
+        $name= "(Tous)";
         include("vues/v_formulairePraticien.php");
         break;
     }

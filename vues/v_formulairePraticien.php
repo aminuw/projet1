@@ -1,7 +1,7 @@
 <section class="bg-light">
     <div class="container">
         <div class="structure-hero pt-lg-5 pt-4">
-            <h1 class="titre text-center">Gestion des praticiens</h1>
+            <h1 class="titre text-center">Gestion des praticiens <?php echo $name; ?></h1>
             <p class="text text-center">
                 Sélectionnez un praticien pour afficher, modifier ses informations, ou ajoutez un nouveau praticien.
             </p>
