@@ -3,14 +3,39 @@
 include_once 'bd.inc.php';
 
 /**
- * Récupère tous les rapports de visite avec filtres
- * MODIFIÉ : Filtre sur ETAT_CODE = 2 (Validé) au lieu de RAP_ETAT = "valide"
+ * Récupère tous les visiteurs d'une région pour le filtre
  */
-function getRapportsAvecFiltres($matricule, $dateDebut = null, $dateFin = null, $praticien = null, $region = null)
+function getVisiteursRegion($region)
 {
     try {
         $monPdo = connexionPDO();
-        
+
+        $req = 'SELECT COL_MATRICULE, CONCAT(COL_NOM, " ", COL_PRENOM) as nom_complet
+                FROM collaborateur
+                WHERE REG_CODE = :region AND HAB_ID = 1
+                ORDER BY COL_NOM, COL_PRENOM';
+
+        $stmt = $monPdo->prepare($req);
+        $stmt->bindParam(':region', $region, PDO::PARAM_STR);
+        $stmt->execute();
+
+        return $stmt->fetchAll();
+
+    } catch (PDOException $e) {
+        print "Erreur !: " . $e->getMessage();
+        die();
+    }
+}
+
+/**
+ * Récupère tous les rapports de visite avec filtres
+ * MODIFIÉ : Filtre sur ETAT_CODE = 2 (Validé) au lieu de RAP_ETAT = "valide"
+ */
+function getRapportsAvecFiltres($matricule, $dateDebut = null, $dateFin = null, $praticien = null, $region = null, $visiteur = null)
+{
+    try {
+        $monPdo = connexionPDO();
+
         $req = 'SELECT DISTINCT
                     r.COL_MATRICULE,
                     r.RAP_NUM,
@@ -32,7 +57,7 @@ function getRapportsAvecFiltres($matricule, $dateDebut = null, $dateFin = null, 
                 LEFT JOIN medicament med2 ON r.MED_DEPOTLEGAL_2 = med2.MED_DEPOTLEGAL
                 LEFT JOIN etat e ON r.ETAT_CODE = e.ETAT_CODE
                 WHERE r.ETAT_CODE = 1'; // CORRECTION ICI : 2 = Validé
-        
+
         // Filtres selon le rôle
         if (!empty($region)) {
             // Pour les délégués régionaux : voir les rapports de leur région
@@ -45,50 +70,59 @@ function getRapportsAvecFiltres($matricule, $dateDebut = null, $dateFin = null, 
             // Pour les visiteurs : seulement leurs rapports
             $req .= ' AND r.COL_MATRICULE = :matricule';
         }
-        
+
         // Filtre par date de début
         if (!empty($dateDebut)) {
             $req .= ' AND r.RAP_DATEVISITE >= :dateDebut';
         }
-        
+
         // Filtre par date de fin
         if (!empty($dateFin)) {
             $req .= ' AND r.RAP_DATEVISITE <= :dateFin';
         }
-        
+
         // Filtre par praticien
         if (!empty($praticien)) {
             $req .= ' AND r.PRA_NUM = :praticien';
         }
-        
+
+        // Filtre par visiteur (pour les délégués/responsables)
+        if (!empty($visiteur)) {
+            $req .= ' AND r.COL_MATRICULE = :visiteur';
+        }
+
         // Tri par date décroissant
         $req .= ' ORDER BY r.RAP_DATEVISITE DESC';
-        
+
         $stmt = $monPdo->prepare($req);
-        
+
         // Bind des paramètres
         if (!empty($region)) {
             $stmt->bindParam(':region', $region, PDO::PARAM_STR);
         } else {
             $stmt->bindParam(':matricule', $matricule, PDO::PARAM_STR);
         }
-        
+
         if (!empty($dateDebut)) {
             $stmt->bindParam(':dateDebut', $dateDebut, PDO::PARAM_STR);
         }
-        
+
         if (!empty($dateFin)) {
             $stmt->bindParam(':dateFin', $dateFin, PDO::PARAM_STR);
         }
-        
+
         if (!empty($praticien)) {
             $stmt->bindParam(':praticien', $praticien, PDO::PARAM_INT);
         }
-        
+
+        if (!empty($visiteur)) {
+            $stmt->bindParam(':visiteur', $visiteur, PDO::PARAM_STR);
+        }
+
         $stmt->execute();
         $result = $stmt->fetchAll();
         return $result;
-        
+
     } catch (PDOException $e) {
         print "Erreur !: " . $e->getMessage();
         die();
@@ -103,7 +137,7 @@ function getDetailRapport($matricule, $numRapport)
 {
     try {
         $monPdo = connexionPDO();
-        
+
         $req = 'SELECT 
                     r.*,
                     CONCAT(p.PRA_NOM, " ", p.PRA_PRENOM) as praticien_nom,
@@ -126,14 +160,14 @@ function getDetailRapport($matricule, $numRapport)
                 LEFT JOIN etat e ON r.ETAT_CODE = e.ETAT_CODE
                 WHERE r.COL_MATRICULE = :matricule 
                 AND r.RAP_NUM = :num';
-        
+
         $stmt = $monPdo->prepare($req);
         $stmt->bindParam(':matricule', $matricule, PDO::PARAM_STR);
         $stmt->bindParam(':num', $numRapport, PDO::PARAM_INT);
         $stmt->execute();
-        
+
         return $stmt->fetch();
-        
+
     } catch (PDOException $e) {
         print "Erreur !: " . $e->getMessage();
         die();
@@ -147,7 +181,7 @@ function getEchantillonsDetailRapport($matricule, $numRapport)
 {
     try {
         $monPdo = connexionPDO();
-        
+
         $req = 'SELECT 
                     o.OFF_QTE,
                     o.MED_DEPOTLEGAL,
@@ -156,14 +190,14 @@ function getEchantillonsDetailRapport($matricule, $numRapport)
                 INNER JOIN medicament m ON o.MED_DEPOTLEGAL = m.MED_DEPOTLEGAL
                 WHERE o.COL_MATRICULE = :matricule 
                 AND o.RAP_NUM = :num';
-        
+
         $stmt = $monPdo->prepare($req);
         $stmt->bindParam(':matricule', $matricule, PDO::PARAM_STR);
         $stmt->bindParam(':num', $numRapport, PDO::PARAM_INT);
         $stmt->execute();
-        
+
         return $stmt->fetchAll();
-        
+
     } catch (PDOException $e) {
         print "Erreur !: " . $e->getMessage();
         die();
@@ -177,7 +211,7 @@ function getPraticiensPourFiltre($region = null)
 {
     try {
         $monPdo = connexionPDO();
-        
+
         if (!empty($region)) {
             // Pour délégués : praticiens de la région
             $req = "SELECT DISTINCT p.PRA_NUM, CONCAT(p.PRA_NOM, ' ', p.PRA_PRENOM) as nom_complet
@@ -185,7 +219,7 @@ function getPraticiensPourFiltre($region = null)
                     JOIN departement d ON LEFT(p.PRA_CP, 2) = d.NoDEPT
                     WHERE d.REG_CODE = :region
                     ORDER BY p.PRA_NOM, p.PRA_PRENOM";
-            
+
             $stmt = $monPdo->prepare($req);
             $stmt->bindParam(':region', $region, PDO::PARAM_STR);
             $stmt->execute();
@@ -194,12 +228,12 @@ function getPraticiensPourFiltre($region = null)
             $req = "SELECT PRA_NUM, CONCAT(PRA_NOM, ' ', PRA_PRENOM) as nom_complet
                     FROM praticien
                     ORDER BY PRA_NOM, PRA_PRENOM";
-            
+
             $stmt = $monPdo->query($req);
         }
-        
+
         return $stmt->fetchAll();
-        
+
     } catch (PDOException $e) {
         print "Erreur !: " . $e->getMessage();
         die();
