@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Hôte : 127.0.0.1:3307
--- Généré le : mar. 25 nov. 2025 à 07:40
+-- Généré le : jeu. 04 déc. 2025 à 07:57
 -- Version du serveur : 11.5.2-MariaDB
 -- Version de PHP : 8.3.14
 
@@ -52,10 +52,10 @@ CREATE TABLE IF NOT EXISTS `collaborateur` (
 INSERT INTO `collaborateur` (`COL_MATRICULE`, `COL_NOM`, `COL_PRENOM`, `COL_ADRESSE`, `COL_CP`, `COL_VILLE`, `COL_DATEEMBAUCHE`, `HAB_ID`, `SEC_CODE`, `REG_CODE`) VALUES
 ('a131', 'Villechalane', 'Louis', '8 cours Lafontaine', '29000', 'BREST', '1992-12-11 00:00:00', 1, 'E', 'BG'),
 ('a17', 'Andre', 'David', '1 r Aimon de Chissée', '38100', 'GRENOBLE', '1991-08-26 00:00:00', 1, NULL, 'RA'),
-('a55', 'Bedos', 'Christian', '1 r Bénédictins', '65000', 'TARBES', '1987-07-17 00:00:00', 1, NULL, 'OC'),
+('a55', 'Bedos', 'Christian', '1 r Bénédictins', '65000', 'TARBES', '1987-07-17 00:00:00', 3, NULL, 'OC'),
 ('a93', 'Tusseau', 'Louis', '22 r Renou', '86000', 'POITIERS', '1999-01-02 00:00:00', 1, NULL, 'AQ'),
 ('b13', 'Bentot', 'Pascal', '11 av 6 Juin', '67000', 'STRASBOURG', '1996-03-11 00:00:00', 1, NULL, 'GE'),
-('b16', 'Bioret', 'Luc', '1 r Linne', '35000', 'RENNES', '1997-03-21 00:00:00', 1, NULL, 'BG'),
+('b16', 'Bioret', 'Luc', '1 r Linne', '35000', 'RENNES', '1997-03-21 00:00:00', 2, NULL, 'BG'),
 ('b19', 'Bunisset', 'Francis', '10 r Nicolas Chorier', '85000', 'LA ROCHE SUR YON', '1999-01-31 00:00:00', 1, NULL, 'PL'),
 ('b25', 'Bunisset', 'Denise', '1 r Lionne', '49100', 'ANGERS', '1994-07-03 00:00:00', 1, NULL, 'PL'),
 ('b28', 'Cacheux', 'Bernard', '114 r Authie', '34000', 'MONTPELLIER', '2000-08-02 00:00:00', 1, NULL, 'OC'),
@@ -245,6 +245,27 @@ CREATE TABLE IF NOT EXISTS `dosage` (
   `DOS_UNITE` int(11) NOT NULL,
   PRIMARY KEY (`DOS_CODE`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_bin;
+
+-- --------------------------------------------------------
+
+--
+-- Structure de la table `etat`
+--
+
+DROP TABLE IF EXISTS `etat`;
+CREATE TABLE IF NOT EXISTS `etat` (
+  `ETAT_CODE` int(11) NOT NULL,
+  `ETAT_LIBELLE` varchar(50) DEFAULT NULL,
+  PRIMARY KEY (`ETAT_CODE`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_bin;
+
+--
+-- Déchargement des données de la table `etat`
+--
+
+INSERT INTO `etat` (`ETAT_CODE`, `ETAT_LIBELLE`) VALUES
+(1, 'En cours de saisie'),
+(2, 'Validé');
 
 -- --------------------------------------------------------
 
@@ -465,37 +486,6 @@ INSERT INTO `medicament` (`MED_DEPOTLEGAL`, `MED_NOMCOMMERCIAL`, `MED_COMPOSITIO
 -- --------------------------------------------------------
 
 --
--- Structure de la table `motif`
---
-
-DROP TABLE IF EXISTS `motif`;
-CREATE TABLE IF NOT EXISTS `motif` (
-  `ID_MOTIF` int(11) NOT NULL,
-  `LIBELLE_MOTIF` varchar(50) NOT NULL,
-  `RAP_NUM` int(11) NOT NULL,
-  `COL_MATRICULE` varchar(10) NOT NULL,
-  PRIMARY KEY (`ID_MOTIF`),
-  KEY `FK_MOTIF_RAPPORT` (`COL_MATRICULE`,`RAP_NUM`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_bin;
-
---
--- Déchargement des données de la table `motif`
---
-
-INSERT INTO `motif` (`ID_MOTIF`, `LIBELLE_MOTIF`, `RAP_NUM`, `COL_MATRICULE`) VALUES
-(1, 'Nouveauté ou actualisation', 4, 'a131'),
-(2, 'Nouveauté ou actualisation', 3, 'a131'),
-(3, 'Périodicité', 5, 'a131'),
-(5, 'Autre', 1, 'a131'),
-(6, 'Autre', 6, 'a131'),
-(9, 'Autre', 2, 'a131'),
-(10, 'Périodicité', 7, 'a131'),
-(11, 'Autre', 9, 'a131'),
-(12, 'Autre', 8, 'a131');
-
--- --------------------------------------------------------
-
---
 -- Structure de la table `motif_visite`
 --
 
@@ -539,9 +529,7 @@ CREATE TABLE IF NOT EXISTS `offrir` (
 --
 
 INSERT INTO `offrir` (`OFF_QTE`, `MED_DEPOTLEGAL`, `RAP_NUM`, `COL_MATRICULE`) VALUES
-(5, 'INSXT5', 4, 'a131'),
-(10, 'JOVAI8', 9, 'a131'),
-(1, 'LIDOXY23', 4, 'a131');
+(10, 'JOVAI8', 9, 'a131');
 
 -- --------------------------------------------------------
 
@@ -755,29 +743,36 @@ CREATE TABLE IF NOT EXISTS `rapport_visite` (
   `MED_DEPOTLEGAL_1` varchar(10) DEFAULT NULL,
   `MED_DEPOTLEGAL_2` varchar(10) DEFAULT NULL,
   `AUTRE_MOTIF` varchar(50) NOT NULL,
-  `RAP_ETAT` varchar(20) DEFAULT 'en_cours',
+  `ETAT_CODE` int(11) NOT NULL DEFAULT 1,
   PRIMARY KEY (`COL_MATRICULE`,`RAP_NUM`),
   KEY `rapport_visite_praticien2_FK` (`PRA_NUM`),
   KEY `FK_Rapport_Med1_unique` (`MED_DEPOTLEGAL_1`),
   KEY `FK_Rapport_Med2_unique` (`MED_DEPOTLEGAL_2`),
   KEY `FK_Rapport_PraRempl_unique` (`PRA_NUM_praticien`),
-  KEY `FK_RAP_MOTIF` (`RAP_MOTIF`)
+  KEY `FK_RAP_MOTIF` (`RAP_MOTIF`),
+  KEY `ETAT_CODE` (`ETAT_CODE`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_bin;
 
 --
 -- Déchargement des données de la table `rapport_visite`
 --
 
-INSERT INTO `rapport_visite` (`COL_MATRICULE`, `RAP_NUM`, `RAP_DATEVISITE`, `RAP_BILAN`, `RAP_MOTIF`, `PRA_NUM`, `PRA_NUM_praticien`, `MED_DEPOTLEGAL_1`, `MED_DEPOTLEGAL_2`, `AUTRE_MOTIF`, `RAP_ETAT`) VALUES
-('a131', 1, '2002-04-18', 'Médecin curieux, à recontacter en décembre pour réunion.', NULL, 23, NULL, NULL, NULL, 'azeazea', 'valide'),
-('a131', 2, '2003-03-23', 'RAS.\r\nChangement de tel : 05 89 89 89 89.', 5, 41, NULL, NULL, NULL, 'azea', 'valide'),
-('a131', 3, '2021-12-03', 'Médecin énervé, ancien boxeur !', NULL, 7, NULL, NULL, NULL, '', 'valide'),
-('a131', 4, '2025-10-25', 'aaaaaaaaaaaaaaaaaaa', NULL, 41, NULL, 'LIDOXY23', 'INSXT5', '', 'valide'),
-('a131', 5, '2025-10-28', 'test', NULL, 15, NULL, 'BACTIV13', NULL, '', 'valide'),
-('a131', 6, '2025-11-04', 'test', NULL, 41, 81, 'EQUILARX6', NULL, 'Malade', 'valide'),
-('a131', 7, '2025-11-17', 'azeeeeee', 1, 81, NULL, NULL, NULL, '', 'valide'),
-('a131', 8, '2025-11-11', 'aze', 5, 41, NULL, NULL, NULL, 'aa', 'en_cours'),
-('a131', 9, '2025-11-18', 'azer', 5, 81, NULL, NULL, NULL, 'aaaaaaaa', 'valide');
+INSERT INTO `rapport_visite` (`COL_MATRICULE`, `RAP_NUM`, `RAP_DATEVISITE`, `RAP_BILAN`, `RAP_MOTIF`, `PRA_NUM`, `PRA_NUM_praticien`, `MED_DEPOTLEGAL_1`, `MED_DEPOTLEGAL_2`, `AUTRE_MOTIF`, `ETAT_CODE`) VALUES
+('a131', 1, '2002-04-18', 'Médecin curieux, à recontacter en décembre pour réunion.', 5, 23, NULL, NULL, NULL, 'azeazea', 2),
+('a131', 2, '2003-03-23', 'RAS.\r\nChangement de tel : 05 89 89 89 89.', 5, 41, NULL, NULL, NULL, 'azea', 2),
+('a131', 3, '2021-12-03', 'Médecin énervé, ancien boxeur !', 2, 7, NULL, NULL, NULL, '', 2),
+('a131', 4, '2025-10-25', 'aaaaaaaaaaaaaaaaaaa', 3, 41, NULL, NULL, NULL, '', 2),
+('a131', 5, '2025-10-28', 'test', 1, 15, NULL, 'BACTIV13', NULL, '', 1),
+('a131', 6, '2025-11-04', 'test', 5, 41, 81, 'EQUILARX6', NULL, 'Malade', 1),
+('a131', 7, '2025-11-17', 'azeeeeee', 1, 81, NULL, NULL, NULL, '', 1),
+('a131', 8, '2025-11-11', 'aze', 5, 41, NULL, NULL, NULL, 'aa', 1),
+('a131', 9, '2025-11-18', 'azer', 5, 81, NULL, NULL, NULL, 'aaaaaaaa', 1),
+('a131', 10, '2025-11-12', 'ezrt', 2, 81, NULL, 'ADIMOL9', 'AMOX45', '', 1),
+('a131', 11, '2005-11-21', 'test', 5, 74, NULL, NULL, NULL, 'aaaaaa', 2),
+('a131', 12, '2025-11-11', 'aezaerzrz', 1, 81, NULL, NULL, NULL, '', 2),
+('a131', 13, '2025-11-27', 'zzaeaz', 2, 47, NULL, NULL, NULL, '', 1),
+('b16', 1, '2025-12-01', 'rtytrutr', 1, 81, NULL, NULL, NULL, '', 2),
+('b16', 2, '2025-12-02', 'test', 1, 41, 56, NULL, NULL, '', 2);
 
 -- --------------------------------------------------------
 
@@ -986,49 +981,10 @@ ALTER TABLE `collaborateur`
   ADD CONSTRAINT `collaborateur_secteur0_FK` FOREIGN KEY (`SEC_CODE`) REFERENCES `secteur` (`SEC_CODE`);
 
 --
--- Contraintes pour la table `departement`
---
-ALTER TABLE `departement`
-  ADD CONSTRAINT `FK_region` FOREIGN KEY (`REG_CODE`) REFERENCES `region` (`REG_CODE`);
-
---
--- Contraintes pour la table `formuler`
---
-ALTER TABLE `formuler`
-  ADD CONSTRAINT `FORMULER_medicament0_FK` FOREIGN KEY (`MED_DEPOTLEGAL`) REFERENCES `medicament` (`MED_DEPOTLEGAL`),
-  ADD CONSTRAINT `FORMULER_presentation1_FK` FOREIGN KEY (`PRE_CODE`) REFERENCES `presentation` (`PRE_CODE`);
-
---
--- Contraintes pour la table `login`
---
-ALTER TABLE `login`
-  ADD CONSTRAINT `login_collaborateur0_FK` FOREIGN KEY (`COL_MATRICULE`) REFERENCES `collaborateur` (`COL_MATRICULE`);
-
---
 -- Contraintes pour la table `medicament`
 --
 ALTER TABLE `medicament`
   ADD CONSTRAINT `medicament_famille0_FK` FOREIGN KEY (`FAM_CODE`) REFERENCES `famille` (`FAM_CODE`);
-
---
--- Contraintes pour la table `motif`
---
-ALTER TABLE `motif`
-  ADD CONSTRAINT `FK_MOTIF_RAPPORT` FOREIGN KEY (`COL_MATRICULE`,`RAP_NUM`) REFERENCES `rapport_visite` (`COL_MATRICULE`, `RAP_NUM`);
-
---
--- Contraintes pour la table `offrir`
---
-ALTER TABLE `offrir`
-  ADD CONSTRAINT `FK_offrir_medicament` FOREIGN KEY (`MED_DEPOTLEGAL`) REFERENCES `medicament` (`MED_DEPOTLEGAL`),
-  ADD CONSTRAINT `FK_offrir_rapport` FOREIGN KEY (`COL_MATRICULE`,`RAP_NUM`) REFERENCES `rapport_visite` (`COL_MATRICULE`, `RAP_NUM`);
-
---
--- Contraintes pour la table `posseder`
---
-ALTER TABLE `posseder`
-  ADD CONSTRAINT `POSSEDER_praticien1_FK` FOREIGN KEY (`PRA_NUM`) REFERENCES `praticien` (`PRA_NUM`),
-  ADD CONSTRAINT `POSSEDER_specialite0_FK` FOREIGN KEY (`SPE_CODE`) REFERENCES `specialite` (`SPE_CODE`);
 
 --
 -- Contraintes pour la table `praticien`
@@ -1037,18 +993,10 @@ ALTER TABLE `praticien`
   ADD CONSTRAINT `praticien_type_praticien0_FK` FOREIGN KEY (`TYP_CODE`) REFERENCES `type_praticien` (`TYP_CODE`);
 
 --
--- Contraintes pour la table `prescrire`
---
-ALTER TABLE `prescrire`
-  ADD CONSTRAINT `FK_PRESCRIRE_DOSAGE` FOREIGN KEY (`DOS_CODE`) REFERENCES `dosage` (`DOS_CODE`),
-  ADD CONSTRAINT `FK_PRESCRIRE_MEDICAMENT` FOREIGN KEY (`MED_DEPOTLEGAL`) REFERENCES `medicament` (`MED_DEPOTLEGAL`),
-  ADD CONSTRAINT `FK_PRESCRIRE_TYPE_INDIVIDU` FOREIGN KEY (`TIN_Code`) REFERENCES `type_individu` (`TIN_Code`);
-
---
 -- Contraintes pour la table `rapport_visite`
 --
 ALTER TABLE `rapport_visite`
-  ADD CONSTRAINT `FK_RAP_MOTIF` FOREIGN KEY (`RAP_MOTIF`) REFERENCES `motif` (`ID_MOTIF`),
+  ADD CONSTRAINT `FK_RAP_MOTIF` FOREIGN KEY (`RAP_MOTIF`) REFERENCES `motif_visite` (`MOT_ID`),
   ADD CONSTRAINT `FK_Rapport_Col` FOREIGN KEY (`COL_MATRICULE`) REFERENCES `collaborateur` (`COL_MATRICULE`),
   ADD CONSTRAINT `FK_Rapport_Med1_unique` FOREIGN KEY (`MED_DEPOTLEGAL_1`) REFERENCES `medicament` (`MED_DEPOTLEGAL`),
   ADD CONSTRAINT `FK_Rapport_Med2_unique` FOREIGN KEY (`MED_DEPOTLEGAL_2`) REFERENCES `medicament` (`MED_DEPOTLEGAL`),
