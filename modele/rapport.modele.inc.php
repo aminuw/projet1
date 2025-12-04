@@ -65,7 +65,7 @@ function insertRapportVisite($data)
 {
     try {
         $monPdo = connexionPDO();
-        
+
         // On détermine le code état (1 = En cours, 2 = Validé)
         // On vérifie si l'entrée est 'valide' (string) ou 2 (int)
         $etatCode = 1; // Par défaut "En cours"
@@ -98,38 +98,38 @@ function insertRapportVisite($data)
                     :autre_motif,
                     :etat_code
                 )';
-        
+
         $stmt = $monPdo->prepare($req);
-        
+
         $stmt->bindParam(':matricule', $data['matricule'], PDO::PARAM_STR);
         $stmt->bindParam(':num_rapport', $data['num_rapport'], PDO::PARAM_INT);
         $stmt->bindParam(':date_visite', $data['date_visite'], PDO::PARAM_STR);
         $stmt->bindParam(':bilan', $data['bilan'], PDO::PARAM_STR);
-        
+
         $motif = !empty($data['motif']) ? $data['motif'] : null;
         $stmt->bindParam(':motif', $motif, PDO::PARAM_INT);
-        
+
         $stmt->bindParam(':pra_num', $data['praticien'], PDO::PARAM_INT);
-        
+
         $pra_remplacant = !empty($data['praticien_remplacant']) ? $data['praticien_remplacant'] : null;
         $stmt->bindParam(':pra_remplacant', $pra_remplacant, PDO::PARAM_INT);
-        
+
         $med1 = !empty($data['medicament1']) ? $data['medicament1'] : null;
         $stmt->bindParam(':med1', $med1, PDO::PARAM_STR);
-        
+
         $med2 = !empty($data['medicament2']) ? $data['medicament2'] : null;
         $stmt->bindParam(':med2', $med2, PDO::PARAM_STR);
-        
+
         $autre_motif = !empty($data['autre_motif']) ? $data['autre_motif'] : '';
         $stmt->bindParam(':autre_motif', $autre_motif, PDO::PARAM_STR);
-        
+
         // ICI : On bind l'entier
         $stmt->bindParam(':etat_code', $etatCode, PDO::PARAM_INT);
-        
+
         $result = $stmt->execute();
-        
+
         return $result;
-        
+
     } catch (PDOException $e) {
         echo "Erreur SQL : " . $e->getMessage();
         die();
@@ -143,12 +143,12 @@ function insertEchantillons($matricule, $numRapport, $echantillons)
 {
     try {
         $monPdo = connexionPDO();
-        
+
         foreach ($echantillons as $depot => $quantite) {
             if (!empty($depot) && $quantite > 0) {
                 $req = 'INSERT INTO offrir (MED_DEPOTLEGAL, RAP_NUM, COL_MATRICULE, OFF_QTE) 
                         VALUES (:depot, :num, :matricule, :qte)';
-                
+
                 $stmt = $monPdo->prepare($req);
                 $stmt->bindParam(':depot', $depot, PDO::PARAM_STR);
                 $stmt->bindParam(':num', $numRapport, PDO::PARAM_INT);
@@ -178,7 +178,7 @@ function getRapportsEnCours($matricule)
                 INNER JOIN praticien p ON r.PRA_NUM = p.PRA_NUM
                 WHERE r.COL_MATRICULE = :matricule AND r.ETAT_CODE = 1
                 ORDER BY r.RAP_NUM DESC';
-        
+
         $stmt = $monPdo->prepare($req);
         $stmt->bindParam(':matricule', $matricule, PDO::PARAM_STR);
         $stmt->execute();
@@ -199,7 +199,7 @@ function getRapportById($matricule, $numRapport)
         $monPdo = connexionPDO();
         $req = 'SELECT * FROM rapport_visite 
                 WHERE COL_MATRICULE = :matricule AND RAP_NUM = :num';
-        
+
         $stmt = $monPdo->prepare($req);
         $stmt->bindParam(':matricule', $matricule, PDO::PARAM_STR);
         $stmt->bindParam(':num', $numRapport, PDO::PARAM_INT);
@@ -222,7 +222,7 @@ function getEchantillonsRapport($matricule, $numRapport)
         $req = 'SELECT MED_DEPOTLEGAL, OFF_QTE 
                 FROM offrir 
                 WHERE COL_MATRICULE = :matricule AND RAP_NUM = :num';
-        
+
         $stmt = $monPdo->prepare($req);
         $stmt->bindParam(':matricule', $matricule, PDO::PARAM_STR);
         $stmt->bindParam(':num', $numRapport, PDO::PARAM_INT);
@@ -245,15 +245,15 @@ function getMotifRapport($matricule, $numRapport)
         $req = 'SELECT RAP_MOTIF 
                 FROM rapport_visite 
                 WHERE COL_MATRICULE = :matricule AND RAP_NUM = :num';
-        
+
         $stmt = $monPdo->prepare($req);
         $stmt->bindParam(':matricule', $matricule, PDO::PARAM_STR);
         $stmt->bindParam(':num', $numRapport, PDO::PARAM_INT);
         $stmt->execute();
-        
+
         $result = $stmt->fetch();
         return $result ? $result['RAP_MOTIF'] : null;
-        
+
     } catch (PDOException $e) {
         print "Erreur !: " . $e->getMessage();
         die();
@@ -268,7 +268,7 @@ function updateRapportVisite($data)
 {
     try {
         $monPdo = connexionPDO();
-        
+
         // Conversion de l'état en entier pour la BDD
         $etatCode = 1; // Default "En cours"
         if (isset($data['etat']) && ($data['etat'] === 'valide' || $data['etat'] == 2)) {
@@ -286,38 +286,38 @@ function updateRapportVisite($data)
                     AUTRE_MOTIF = :autre_motif,
                     ETAT_CODE = :etat_code
                 WHERE COL_MATRICULE = :matricule AND RAP_NUM = :num_rapport';
-        
+
         $stmt = $monPdo->prepare($req);
-        
+
         $stmt->bindParam(':matricule', $data['matricule'], PDO::PARAM_STR);
         $stmt->bindParam(':num_rapport', $data['num_rapport'], PDO::PARAM_INT);
         $stmt->bindParam(':date_visite', $data['date_visite'], PDO::PARAM_STR);
         $stmt->bindParam(':bilan', $data['bilan'], PDO::PARAM_STR);
-        
+
         $motif = !empty($data['motif']) ? $data['motif'] : null;
         $stmt->bindParam(':motif', $motif, PDO::PARAM_INT);
-        
+
         $stmt->bindParam(':pra_num', $data['praticien'], PDO::PARAM_INT);
-        
+
         $pra_remplacant = !empty($data['praticien_remplacant']) ? $data['praticien_remplacant'] : null;
         $stmt->bindParam(':pra_remplacant', $pra_remplacant, PDO::PARAM_INT);
-        
+
         $med1 = !empty($data['medicament1']) ? $data['medicament1'] : null;
         $stmt->bindParam(':med1', $med1, PDO::PARAM_STR);
-        
+
         $med2 = !empty($data['medicament2']) ? $data['medicament2'] : null;
         $stmt->bindParam(':med2', $med2, PDO::PARAM_STR);
-        
+
         $autre_motif = !empty($data['autre_motif']) ? $data['autre_motif'] : '';
         $stmt->bindParam(':autre_motif', $autre_motif, PDO::PARAM_STR);
-        
+
         // ICI : Update avec l'int
         $stmt->bindParam(':etat_code', $etatCode, PDO::PARAM_INT);
-        
+
         $result = $stmt->execute();
-        
+
         return $result;
-        
+
     } catch (PDOException $e) {
         echo "Erreur SQL : " . $e->getMessage();
         return false;
@@ -334,14 +334,14 @@ function updateMotifRapport($matricule, $numRapport, $motifId)
         $req = 'UPDATE rapport_visite 
                 SET RAP_MOTIF = :motif 
                 WHERE COL_MATRICULE = :matricule AND RAP_NUM = :num';
-                
+
         $stmt = $monPdo->prepare($req);
         $stmt->bindParam(':matricule', $matricule, PDO::PARAM_STR);
         $stmt->bindParam(':num', $numRapport, PDO::PARAM_INT);
         $stmt->bindParam(':motif', $motifId, PDO::PARAM_INT);
-        
+
         return $stmt->execute();
-        
+
     } catch (PDOException $e) {
         error_log("Erreur update motif : " . $e->getMessage());
         return false;
@@ -356,11 +356,11 @@ function deleteEchantillonsRapport($matricule, $numRapport)
     try {
         $monPdo = connexionPDO();
         $req = 'DELETE FROM offrir WHERE COL_MATRICULE = :matricule AND RAP_NUM = :num';
-        
+
         $stmt = $monPdo->prepare($req);
         $stmt->bindParam(':matricule', $matricule, PDO::PARAM_STR);
         $stmt->bindParam(':num', $numRapport, PDO::PARAM_INT);
-        
+
         return $stmt->execute();
     } catch (PDOException $e) {
         print "Erreur !: " . $e->getMessage();

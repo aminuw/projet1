@@ -8,9 +8,9 @@
         // Affichage du message d'erreur si aucun rapport trouvé
         if (isset($_SESSION['erreur_consultation'])) {
             echo '<div class="alert alert-warning m-3 text-center">
-                    <i class="bi bi-exclamation-triangle"></i> ' . 
-                    htmlspecialchars($_SESSION['erreur_consultation']) . 
-                  '</div>';
+                    <i class="bi bi-exclamation-triangle"></i> ' .
+                htmlspecialchars($_SESSION['erreur_consultation']) .
+                '</div>';
             unset($_SESSION['erreur_consultation']);
         }
         ?>
@@ -20,7 +20,7 @@
                 <div class="card shadow">
                     <div class="card-body p-4">
                         <form action="index.php?uc=consultation&action=liste" method="post">
-                            
+
                             <!-- Période de recherche -->
                             <div class="mb-4">
                                 <h5 class="carac mb-3">
@@ -29,20 +29,14 @@
                                 <div class="row">
                                     <div class="col-md-6 mb-3">
                                         <label for="date_debut" class="form-label">Date de début</label>
-                                        <input type="date" 
-                                               class="form-control" 
-                                               id="date_debut" 
-                                               name="date_debut"
-                                               max="<?php echo date('Y-m-d'); ?>">
+                                        <input type="date" class="form-control" id="date_debut" name="date_debut"
+                                            max="<?php echo date('Y-m-d'); ?>">
                                         <small class="text-muted">Optionnel</small>
                                     </div>
                                     <div class="col-md-6 mb-3">
                                         <label for="date_fin" class="form-label">Date de fin</label>
-                                        <input type="date" 
-                                               class="form-control" 
-                                               id="date_fin" 
-                                               name="date_fin"
-                                               max="<?php echo date('Y-m-d'); ?>">
+                                        <input type="date" class="form-control" id="date_fin" name="date_fin"
+                                            max="<?php echo date('Y-m-d'); ?>">
                                         <small class="text-muted">Optionnel</small>
                                     </div>
                                 </div>
@@ -57,19 +51,38 @@
                                     <option value="">-- Tous les praticiens --</option>
                                     <?php
                                     foreach ($praticiens as $prat) {
-                                        echo '<option value="' . $prat['PRA_NUM'] . '">' . 
-                                             htmlspecialchars($prat['nom_complet']) . 
-                                             '</option>';
+                                        echo '<option value="' . $prat['PRA_NUM'] . '">' .
+                                            htmlspecialchars($prat['nom_complet']) .
+                                            '</option>';
                                     }
                                     ?>
                                 </select>
                                 <small class="text-muted">Optionnel - Filtrer par praticien spécifique</small>
                             </div>
 
-                            <?php if ($_SESSION['habilitation'] == 2): ?>
+                            <?php if ($_SESSION['habilitation'] == 2 || $_SESSION['habilitation'] == 3): ?>
+                                <!-- Filtre par visiteur (uniquement pour délégués et responsables) -->
+                                <div class="mb-4">
+                                    <h5 class="carac mb-3">
+                                        <i class="text"></i> Visiteur médical
+                                    </h5>
+                                    <select class="form-select" id="visiteur" name="visiteur">
+                                        <option value="">-- Tous les visiteurs --</option>
+                                        <?php
+                                        foreach ($visiteurs as $vis) {
+                                            echo '<option value="' . $vis['COL_MATRICULE'] . '">' .
+                                                htmlspecialchars($vis['nom_complet']) . ' (' . $vis['COL_MATRICULE'] . ')' .
+                                                '</option>';
+                                        }
+                                        ?>
+                                    </select>
+                                    <small class="text-muted">Optionnel - Filtrer par visiteur spécifique de votre
+                                        région</small>
+                                </div>
+
                                 <div class="alert alert-info">
-                                    <i class="bi bi-info-circle"></i> 
-                                    <strong>Mode Délégué Régional :</strong> 
+                                    <i class="bi bi-info-circle"></i>
+                                    <strong>Mode Délégué/Responsable :</strong>
                                     Vous visualisez les rapports de votre région (<?php echo $_SESSION['region']; ?>)
                                 </div>
                             <?php endif; ?>
