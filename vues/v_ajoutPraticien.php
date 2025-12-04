@@ -40,10 +40,9 @@
                     <?php unset($_SESSION['confirmation_message']); ?>
                 <?php endif; ?>
                 <form action="index.php?uc=praticien&action=valideAjout" method="post">
-                    <div class="form-group">
-                        <label for="pra_num">Numéro</label>
+                    <div class="form-group" style="display: none;"> 
                         <input type="number" class="form-control" id="pra_num" name="pra_num"
-                            value="<?php echo $newNum; ?>" readonly>
+                            value="<?php echo $newNum; // Numéro de praticien caché envoyé en form ?>" readonly>
                     </div>
                     <div class="form-group">
                         <label for="pra_prenom">Prénom</label>
