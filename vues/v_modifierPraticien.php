@@ -1,7 +1,10 @@
 <?php
 if (isset($_SESSION['form_data'])) {
     $form_data = $_SESSION['form_data'];
-    unset($_SESSION['form_data']);
+    // Ne pas supprimer form_data ici si une confirmation est en attente
+    if (!isset($_SESSION['confirmation_message'])) {
+        unset($_SESSION['form_data']);
+    }
 } else {
     $form_data = $praticien;
 }
@@ -39,13 +42,15 @@ if (isset($_SESSION['form_data'])) {
                                 class="btn btn-danger">Non</a>
                         </form>
                     </div>
-                    <?php unset($_SESSION['confirmation_message']); ?>
+                    <?php 
+                    unset($_SESSION['confirmation_message']); 
+                    unset($_SESSION['form_data']); 
+                    ?>
                 <?php endif; ?>
                 <form action="index.php?uc=praticien&action=valideModification" method="post">
                     <div class="form-group">
-                        <label for="pra_num">Numéro</label>
                         <input type="number" class="form-control" id="pra_num" name="pra_num"
-                            value="<?php echo $praticien['PRA_NUM']; ?>" readonly>
+                            value="<?php echo $praticien['PRA_NUM']; ?>" readonly style="display: none;">
                     </div>
                     <div class="form-group">
                         <label for="pra_prenom">Prénom</label>
