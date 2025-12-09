@@ -10,7 +10,7 @@ if (!isset($_REQUEST['action']) || empty($_REQUEST['action'])) {
 
 switch ($action) {
     case 'gererParRegion': {
-        // HABILITATION: Seuls les délégués et responsables peuvent accéder
+        // Seuls les délégués et responsables peuvent accéder
         if (!estDelegue() && !estResponsable()) {
             $_SESSION['erreur'] = true;
             header("Location: index.php?uc=accueil");
@@ -20,21 +20,14 @@ switch ($action) {
         $loginId = $_SESSION['login'];
         $region = getRegionByLoginId($loginId);
         $praticiens = getAllPraticiensByRegion($region);
-        $name= "(Par Region)";
+        $name = "(Par Region)";
         include("vues/v_formulairePraticien.php");
         break;
     }
 
     case 'gererTous': {
-        // HABILITATION: Seuls les responsables peuvent gérer tous les praticiens
-        if (!estResponsable()) {
-            $_SESSION['erreur'] = true;
-            header("Location: index.php?uc=accueil");
-            exit();
-        }
-
         $praticiens = getAllPraticiens();
-        $name= "(Tous)";
+        $name = "(Tous)";
         include("vues/v_formulairePraticien.php");
         break;
     }
@@ -69,7 +62,7 @@ switch ($action) {
     }
 
     case 'valideAjout': {
-        // HABILITATION: Seuls les délégués et responsables peuvent ajouter
+        // Seuls les délégués et responsables peuvent ajouter
         if (!estDelegue() && !estResponsable()) {
             $_SESSION['erreur'] = true;
             header("Location: index.php?uc=accueil");
@@ -112,7 +105,7 @@ switch ($action) {
             addPraticien($pra_num, $pra_prenom, $pra_nom, $pra_adresse, $pra_cp, $pra_ville, $pra_coefnotoriete, $typ_code, $spe_code);
             unset($_SESSION['form_data']);
             $_SESSION['success_message'] = 'Le praticien a été ajouté avec succès.';
-            header('Location: index.php?uc=praticien&action=formulairepraticien');
+            header('Location: index.php?uc=praticien&action=gererTous');
         } else {
             $missing_fields = [];
             if (!isset($_POST['pra_prenom']) || empty($_POST['pra_prenom'])) {
@@ -191,6 +184,7 @@ switch ($action) {
                 exit();
             }
 
+            // Confirmation si le type n'est pas renseigné
             if (empty($typ_code) && !isset($_GET['confirm_type'])) {
                 $_SESSION["confirmation_message"] = "Le type de praticien n'a pas été renseigné. Voulez-vous continuer ?";
                 $_SESSION['form_data'] = $_POST;
@@ -198,13 +192,19 @@ switch ($action) {
                 exit();
             }
 
-            if (empty($spe_code) && !isset($_GET['confirm_spe']) && !isset($_GET['confirm_type'])) {
+            // Confirmation si aucune spécialité n'est sélectionnée
+            if (empty($spe_code) && !isset($_GET['confirm_spe'])) {
                 $_SESSION["confirmation_message"] = "La spécialité du praticien n'a pas été renseignée. Voulez-vous continuer ?";
                 $_SESSION['form_data'] = $_POST;
-                header('Location: index.php?uc=praticien&action=modifierpraticien&praticien=' . $pra_num . '&confirm_spe=true');
+                $url = 'Location: index.php?uc=praticien&action=modifierpraticien&praticien=' . $pra_num . '&confirm_spe=true';
+                if (isset($_GET['confirm_type'])) {
+                    $url .= '&confirm_type=true';
+                }
+                header($url);
                 exit();
             }
 
+            // Mise à jour du praticien
             updatePraticien($pra_num, $pra_prenom, $pra_nom, $pra_adresse, $pra_cp, $pra_ville, $pra_coefnotoriete, $typ_code, $spe_code);
             unset($_SESSION['form_data']);
             $_SESSION['success_message'] = 'Le praticien a été modifié avec succès.';

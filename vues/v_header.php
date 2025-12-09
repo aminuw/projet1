@@ -39,24 +39,21 @@ include_once("modele/habilitation.modele.inc.php");
                             <a class="nav-link btn-outline-info rounded-pill px-3 fw-bold"
                                 href="index.php?uc=medicaments&action=formulairemedoc">Médicaments</a>
                         </li>
-                        <li class="nav-item dropdown mx-2">
+                        <li class="nav-item dropdown">
                             <?php if (estDelegue() || estResponsable()): ?>
                             <a class="nav-link dropdown-toggle btn-outline-info rounded-pill px-3 fw-bold" href="#"
                                 id="praticienDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                                 Gérer Praticien
                             </a>
                             <ul class="dropdown-menu" aria-labelledby="praticienDropdown">
-                                <!-- Tous Praticiens - Responsable uniquement -->
-                                <?php if (estResponsable()): ?>
+                                <?php if (estResponsable()|| estDelegue()): ?>
                                 <li><a class="dropdown-item" href="index.php?uc=praticien&action=gererTous">Tous Praticiens</a></li>
                                 <?php endif; ?>
                                 
-                                <!-- Praticiens par Région - Délégué et Responsable -->
                                 <?php if (estDelegue() || estResponsable()): ?>
                                 <li><a class="dropdown-item" href="index.php?uc=praticien&action=gererParRegion">Praticien par Région</a></li>
                                 <?php endif; ?>
                                 
-                                <!-- Ajouter Praticien - Délégué et Responsable -->
                                 <?php if (estDelegue() || estResponsable()): ?>
                                 <li><a class="dropdown-item" href="index.php?uc=praticien&action=ajoutpraticien">Ajouter Praticien</a></li>
                                 <?php endif; ?>

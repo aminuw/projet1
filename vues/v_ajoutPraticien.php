@@ -22,7 +22,17 @@
                 <?php if (isset($_SESSION['confirmation_message'])): ?>
                     <div class="alert alert-info" role="alert">
                         <?php echo $_SESSION['confirmation_message']; ?>
-                        <form action="index.php?uc=praticien&action=valideAjout&<?php echo http_build_query($_GET); ?>"
+                        <?php
+                        // Construire l'URL avec les paramètres de confirmation
+                        $confirmParams = '';
+                        if (isset($_GET['confirm_type'])) {
+                            $confirmParams .= '&confirm_type=true';
+                        }
+                        if (isset($_GET['confirm_spe'])) {
+                            $confirmParams .= '&confirm_spe=true';
+                        }
+                        ?>
+                        <form action="index.php?uc=praticien&action=valideAjout<?php echo $confirmParams; ?>"
                             method="post">
                             <?php foreach ($form_data as $key => $value): ?>
                                 <?php if (is_array($value)): ?>
@@ -33,8 +43,8 @@
                                     <input type="hidden" name="<?php echo $key; ?>" value="<?php echo htmlspecialchars($value); ?>">
                                 <?php endif; ?>
                             <?php endforeach; ?>
-                            <button type="submit" class="btn btn-success">Oui</button>
-                            <a href="index.php?uc=praticien&action=ajoutpraticien" class="btn btn-danger">Non</a>
+                            <button type="submit" class="btn btn-success">Je confirme malgré l'absence de spécialités</button>
+                            <a href="index.php?uc=praticien&action=ajoutpraticien" class="btn btn-danger">Annuler</a>
                         </form>
                     </div>
                     <?php unset($_SESSION['confirmation_message']); ?>
@@ -118,6 +128,7 @@
                         <small class="form-text text-muted">Sélectionnez une ou plusieurs spécialités</small>
                     </div>
                     <button type="submit" class="btn btn-primary">Ajouter</button>
+                    <a href="index.php" class="btn btn-secondary" onclick="return confirm('Êtes-vous sûr de vouloir annuler ? Toutes les modifications non enregistrées seront perdues.');">Annuler</a>
                 </form>
             </div>
         </div>
