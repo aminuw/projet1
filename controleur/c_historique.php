@@ -1,5 +1,5 @@
 <?php
-include_once("modele/consultation_rapport.modele.inc.php");
+include_once("modele/historique.modele.inc.php");
 
 if (!isset($_REQUEST['action']) || empty($_REQUEST['action'])) {
     $action = "formulaire";
@@ -10,19 +10,28 @@ if (!isset($_REQUEST['action']) || empty($_REQUEST['action'])) {
 switch ($action) {
 
     case 'formulaire': {
-        // Récupérer la région si c'est un délégué ou responsable
-        $region = ($_SESSION['habilitation'] == 2 || $_SESSION['habilitation'] == 3) ? $_SESSION['region'] : null;
+        // Récupérer la région/secteur selon le rôle
+        $region = null;
+        $secteur = null;
+
+        if ($_SESSION['habilitation'] == 2) {
+            // Délégué : filtre par région
+            $region = $_SESSION['region'];
+        } elseif ($_SESSION['habilitation'] == 3) {
+            // Responsable secteur : filtre par secteur (toutes les régions du secteur)
+            $secteur = $_SESSION['secteur'];
+        }
 
         // Récupérer les praticiens pour le filtre
-        $praticiens = getPraticiensPourFiltre($region);
+        $praticiens = getPraticiensPourFiltre($region, $secteur);
 
         // Récupérer les visiteurs si délégué/responsable
         $visiteurs = array();
-        if ($region) {
-            $visiteurs = getVisiteursRegion($region);
+        if ($region || $secteur) {
+            $visiteurs = getVisiteursRegionOuSecteur($region, $secteur);
         }
 
-        include("vues/v_formulaireConsultationRapport.php");
+        include("vues/v_formulaireHistorique.php");
         break;
     }
 
@@ -33,8 +42,17 @@ switch ($action) {
         $praticien = !empty($_POST['praticien']) ? $_POST['praticien'] : null;
         $visiteur = !empty($_POST['visiteur']) ? $_POST['visiteur'] : null;
 
-        // Vérifier le rôle
-        $region = ($_SESSION['habilitation'] == 2 || $_SESSION['habilitation'] == 3) ? $_SESSION['region'] : null;
+        // Vérifier le rôle et déterminer le filtre
+        $region = null;
+        $secteur = null;
+
+        if ($_SESSION['habilitation'] == 2) {
+            // Délégué : filtre par région
+            $region = $_SESSION['region'];
+        } elseif ($_SESSION['habilitation'] == 3) {
+            // Responsable secteur : filtre par secteur
+            $secteur = $_SESSION['secteur'];
+        }
 
         // Récupérer les rapports
         $rapports = getRapportsAvecFiltres(
@@ -43,7 +61,8 @@ switch ($action) {
             $dateFin,
             $praticien,
             $region,
-            $visiteur
+            $visiteur,
+            $secteur  // Nouveau paramètre
         );
 
         // Vérifier si des rapports existent
@@ -52,6 +71,32 @@ switch ($action) {
             header('Location: index.php?uc=consultation&action=formulaire');
             exit();
         }
+
+        // Afficher la liste
+        include("vues/v_listeRapports.php");
+        break;
+    }
+
+    case 'mesRapports': {
+        // Afficher directement les rapports du visiteur connecté (sans filtres)
+        $rapports = getRapportsAvecFiltres(
+            $_SESSION['matricule'],
+            null,  // Pas de date début
+            null,  // Pas de date fin
+            null,  // Pas de praticien
+            null,  // Pas de région (car c'est pour le visiteur)
+            null   // Pas de visiteur spécifique
+        );
+
+        // Vérifier si des rapports existent
+        if (empty($rapports)) {
+            $_SESSION['erreur_consultation'] = "Vous n'avez aucun rapport de visite.";
+            header('Location: index.php?uc=accueil');
+            exit();
+        }
+
+        // Définir un titre pour la page
+        $titrePage = "Mes rapports validés";
 
         // Afficher la liste
         include("vues/v_listeRapports.php");

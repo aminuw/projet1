@@ -35,11 +35,11 @@ include_once("modele/habilitation.modele.inc.php");
                             <a class="nav-link btn-outline-info rounded-pill px-3 fw-bold"
                                 href="index.php?uc=accueil">Accueil</a>
                         </li>
-                        <li class="nav-item ">
+                        <li class="nav-item mx-2">
                             <a class="nav-link btn-outline-info rounded-pill px-3 fw-bold"
                                 href="index.php?uc=medicaments&action=formulairemedoc">Médicaments</a>
                         </li>
-                        <li class="nav-item dropdown">
+                        <li class="nav-item dropdown mx-2">
                             <?php if (estDelegue() || estResponsable()): ?>
                             <a class="nav-link dropdown-toggle btn-outline-info rounded-pill px-3 fw-bold" href="#"
                                 id="praticienDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
@@ -63,30 +63,40 @@ include_once("modele/habilitation.modele.inc.php");
                             </ul>
                             <?php endif; ?>
                         </li>
-                        <li class="nav-item dropdown">
+                        <li class="nav-item dropdown mx-2">
                             <a class="nav-link btn-outline-info rounded-pill px-3 fw-bold dropdown-toggle" href="#"
                                 id="navbarDropdownRapport" role="button" data-bs-toggle="dropdown"
                                 aria-expanded="false">
                                 Rapports
                             </a>
                             <ul class="dropdown-menu" aria-labelledby="navbarDropdownRapport">
+                                <?php if ($_SESSION['habilitation'] == 1 || $_SESSION['habilitation'] == 2): ?>
                                 <li>
                                     <a class="dropdown-item" href="index.php?uc=rapport&action=saisir">
                                         <i class="navbar-toggler border-0"></i> Saisir un rapport
                                     </a>
                                 </li>
+                                <?php endif; ?>
                                 <li>
-                                    <a class="dropdown-item" href="index.php?uc=consultation&action=formulaire">
-                                        <i class="navbar-toggler border-0"></i> Consulter rapport(s)
+                                    <a class="dropdown-item" href="index.php?uc=consultation&action=mesRapports">
+                                        <i class="navbar-toggler border-0"></i> Consulter mes rapports
                                     </a>
                                 </li>
+                                <?php if ($_SESSION['habilitation'] == 2 || $_SESSION['habilitation'] == 3): ?>
+                                <li>
+                                    <a class="dropdown-item" href="index.php?uc=consultation&action=formulaire">
+                                        <i class="navbar-toggler border-0"></i> 
+                                        <?php echo ($_SESSION['habilitation'] == 3) ? 'Historique par secteur' : 'Historique par région'; ?>
+                                    </a>
+                                </li>
+                                <?php endif; ?>
                             </ul>
                         </li>
-                        <li class="nav-item ">
+                        <li class="nav-item mx-2">
                             <a class="nav-link btn-outline-info rounded-pill px-3 fw-bold"
                                 href="index.php?uc=connexion&action=profil">Profil</a>
                         </li>
-                        <li class="nav-item">
+                        <li class="nav-item mx-2">
                             <a class="nav-link btn-outline-info rounded-pill px-3 fw-bold"
                                 href="index.php?uc=connexion&action=deconnexion"
                                 onclick="return confirm('Voulez-vous vraiment vous déconnecter ?');">Déconnexion</a>

@@ -8,21 +8,28 @@ if (!isset($_REQUEST['action']) || empty($_REQUEST['action'])) {
 }
 
 switch ($action) {
-        
+
     case 'saisir': {
+        // Vérification : seuls les visiteurs (1) et délégués (2) peuvent saisir des rapports
+        if ($_SESSION['habilitation'] != 1 && $_SESSION['habilitation'] != 2) {
+            $_SESSION['erreurs'] = array("Vous n'avez pas l'autorisation de saisir des rapports");
+            header('Location: index.php?uc=accueil');
+            exit();
+        }
+
         // Récupérer les données nécessaires pour le formulaire
         $praticiens = getAllPraticiensForSelect();
-        // $medicaments = getAllNomMedicament(); // Assure-toi que cette fonction existe dans ton modèle
+        $medicaments = getAllNomMedicament();
         $motifs = getAllMotifs();
-        
+
         // Récupérer les rapports en cours du visiteur
         $rapportsEnCours = getRapportsEnCours($_SESSION['matricule']);
-        
+
         // Initialiser les variables pour le formulaire
         $rapportEnCours = null;
         $echantillons = array();
         $motifRapport = null;
-        
+
         include("vues/v_formulaireRapport.php");
         break;
     }
@@ -34,18 +41,18 @@ switch ($action) {
             header('Location: index.php?uc=rapport&action=saisir');
             exit();
         }
-        
+
         $numRapport = $_GET['num'];
-        
+
         // Récupérer le rapport
         $rapportEnCours = getRapportById($_SESSION['matricule'], $numRapport);
-        
+
         if (!$rapportEnCours) {
             $_SESSION['erreurs'] = array("Rapport introuvable");
             header('Location: index.php?uc=rapport&action=saisir');
             exit();
         }
-        
+
         // --- CORRECTION ICI : On vérifie le code (1 = en cours) ---
         // On vérifie que le rapport est bien en cours
         // Si ETAT_CODE est différent de 1, alors il est validé (2) ou archivé
@@ -54,32 +61,32 @@ switch ($action) {
             header('Location: index.php?uc=rapport&action=saisir');
             exit();
         }
-        
+
         // Récupérer les données complémentaires
         $praticiens = getAllPraticiensForSelect();
-        // $medicaments = getAllNomMedicament();
+        $medicaments = getAllNomMedicament();
         $motifs = getAllMotifs();
         $rapportsEnCours = getRapportsEnCours($_SESSION['matricule']);
         $echantillons = getEchantillonsRapport($_SESSION['matricule'], $numRapport);
         $motifRapport = getMotifRapport($_SESSION['matricule'], $numRapport);
-        
+
         include("vues/v_formulaireRapport.php");
         break;
     }
 
     case 'enregistrer': {
-        
+
         // Tableau pour stocker les erreurs
         $erreurs = array();
-        
+
         // Déterminer si c'est une modification ou une création
         $isUpdate = isset($_POST['num_rapport_existant']) && !empty($_POST['num_rapport_existant']);
-        
+
         // Déterminer si c'est une saisie définitive
         $saisieDefinitive = isset($_POST['saisie_definitive']) && $_POST['saisie_definitive'] == '1';
-        
+
         // --- VALIDATION DES CHAMPS OBLIGATOIRES ---
-        
+
         // Date de visite
         if (empty($_POST['date_visite'])) {
             $erreurs[] = "La date de visite est obligatoire";
@@ -89,12 +96,12 @@ switch ($action) {
                 $erreurs[] = "La date de visite ne peut pas être dans le futur";
             }
         }
-        
+
         // Praticien
         if (empty($_POST['praticien'])) {
             $erreurs[] = "Le praticien visité est obligatoire";
         }
-        
+
         // Motif
         if (empty($_POST['motif'])) {
             $erreurs[] = "Le motif de la visite est obligatoire";
@@ -106,15 +113,15 @@ switch ($action) {
                 }
             }
         }
-        
+
         // Bilan
         if (empty($_POST['bilan']) || trim($_POST['bilan']) == '') {
             $erreurs[] = "Le bilan de la visite est obligatoire";
         }
-        
+
         // --- VALIDATION SUPPLÉMENTAIRE SI SAISIE DÉFINITIVE ---
         if ($saisieDefinitive) {
-            
+
             // Vérifier que tous les champs obligatoires sont remplis
             if (!empty($erreurs)) {
                 $_SESSION['erreurs'] = $erreurs;
@@ -122,13 +129,13 @@ switch ($action) {
                 header('Location: index.php?uc=rapport&action=saisir');
                 exit();
             }
-            
+
             // Avertissement si pas de médicament présenté
             if (empty($_POST['medicament1']) && empty($_POST['medicament2'])) {
                 if (!isset($_POST['confirm_no_med']) && !isset($_POST['num_rapport_existant'])) {
                     $_SESSION['avertissement_type'] = 'medicament';
                     $_SESSION['avertissement'] = "Aucun médicament n'a été présenté lors de cette visite. Confirmez-vous ?";
-                    $_SESSION['data_rapport'] = $_POST; 
+                    $_SESSION['data_rapport'] = $_POST;
                     header('Location: index.php?uc=rapport&action=confirmer');
                     exit();
                 } elseif ($isUpdate && !isset($_POST['confirm_no_med'])) {
@@ -139,7 +146,7 @@ switch ($action) {
                     exit();
                 }
             }
-            
+
             // Avertissement si pas d'échantillon
             $hasEchantillons = false;
             if (!empty($_POST['echantillon_med']) && !empty($_POST['echantillon_qte'])) {
@@ -150,12 +157,12 @@ switch ($action) {
                     }
                 }
             }
-            
+
             if (!$hasEchantillons) {
                 if (!isset($_POST['confirm_no_ech']) && !isset($_POST['num_rapport_existant'])) {
                     $_SESSION['avertissement_type'] = 'echantillon';
                     $_SESSION['avertissement'] = "Aucun échantillon n'a été offert lors de cette visite. Confirmez-vous ?";
-                    $_SESSION['data_rapport'] = $_POST; 
+                    $_SESSION['data_rapport'] = $_POST;
                     header('Location: index.php?uc=rapport&action=confirmer');
                     exit();
                 } elseif ($isUpdate && !isset($_POST['confirm_no_ech'])) {
@@ -167,26 +174,26 @@ switch ($action) {
                 }
             }
         }
-        
+
         // --- SI ERREURS ET PAS DE SAISIE DÉFINITIVE ---
         if (!empty($erreurs) && !$saisieDefinitive) {
             $_SESSION['avertissements'] = $erreurs;
             $_SESSION['avertissements'][] = "Rapport enregistré en cours de saisie avec des champs manquants";
         }
-        
+
         // --- ENREGISTREMENT EN BASE DE DONNÉES ---
-        
+
         // --- CORRECTION ICI : On utilise les codes entiers ---
         // 2 = Validé, 1 = En cours
         $etat = $saisieDefinitive ? 2 : 1;
-        
+
         // Déterminer le numéro de rapport
         if ($isUpdate) {
             $numRapport = $_POST['num_rapport_existant'];
         } else {
             $numRapport = getNextNumeroRapport($_SESSION['matricule']);
         }
-        
+
         // Préparer les données
         $data = array(
             'matricule' => $_SESSION['matricule'],
@@ -201,20 +208,20 @@ switch ($action) {
             'autre_motif' => $_POST['autre_motif'] ?? '',
             'etat' => $etat // On passe l'entier (1 ou 2)
         );
-        
+
         // Insertion ou mise à jour du rapport
         if ($isUpdate) {
             $succes = updateRapportVisite($data);
         } else {
             $succes = insertRapportVisite($data);
         }
-        
+
         if ($succes) {
             // Supprimer les anciens échantillons si c'est une modification
             if ($isUpdate) {
                 deleteEchantillonsRapport($_SESSION['matricule'], $numRapport);
             }
-            
+
             // Enregistrer les échantillons
             if (!empty($_POST['echantillon_med']) && !empty($_POST['echantillon_qte'])) {
                 $echantillons = array();
@@ -227,7 +234,7 @@ switch ($action) {
                     insertEchantillons($_SESSION['matricule'], $numRapport, $echantillons);
                 }
             }
-            
+
             // --- CORRECTION ICI : Messages basés sur l'entier 2 (Validé) ---
             if ($isUpdate) {
                 if ($etat == 2) {
@@ -242,16 +249,16 @@ switch ($action) {
                     $_SESSION['succes'] = "Rapport de visite n°" . $numRapport . " enregistré en cours de saisie.";
                 }
             }
-            
+
             // Nettoyer les données temporaires
             unset($_SESSION['data_rapport']);
-            
+
             header('Location: index.php?uc=rapport&action=saisir');
         } else {
             $_SESSION['erreurs'] = array("Une erreur est survenue lors de l'enregistrement du rapport.");
             header('Location: index.php?uc=rapport&action=saisir');
         }
-        
+
         break;
     }
 

@@ -26,6 +26,9 @@
                                     <tr>
                                         <th>N° Rapport</th>
                                         <th>Date visite</th>
+                                        <?php if ($_SESSION['habilitation'] == 2 || $_SESSION['habilitation'] == 3): ?>
+                                            <th>Visiteur</th>
+                                        <?php endif; ?>
                                         <th>Praticien</th>
                                         <th>Motif</th>
                                         <th>Médicaments présentés</th>
@@ -46,6 +49,16 @@
                                                 echo date('d/m/Y', strtotime($rapport['RAP_DATEVISITE']));
                                                 ?>
                                             </td>
+
+                                            <!-- Visiteur (seulement pour délégués/responsables) -->
+                                            <?php if ($_SESSION['habilitation'] == 2 || $_SESSION['habilitation'] == 3): ?>
+                                                <td>
+                                                    <i class="bi bi-person-badge"></i>
+                                                    <?php echo htmlspecialchars($rapport['visiteur_nom']); ?>
+                                                    <br>
+                                                    <small class="text-muted"><?php echo $rapport['COL_MATRICULE']; ?></small>
+                                                </td>
+                                            <?php endif; ?>
 
                                             <!-- Praticien -->
                                             <td>

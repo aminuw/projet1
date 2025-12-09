@@ -2,12 +2,13 @@ LOGIN / MDP
 
 VISITEUR : 
 
-villou / VilLou!
+villou / VilLou! (BG)
+lejagn / LejAgn! (OC)
 
 DELEGUE : 
 
-bioluc / BioLuc!
+bioluc / BioLuc! (BG)
 
 RESPONSABLE : 
 
-bedchr / BedChr! 
+bedchr / BedChr! (OC)

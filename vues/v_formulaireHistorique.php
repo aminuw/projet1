@@ -1,7 +1,29 @@
 <section class="bg-light">
     <div class="container">
         <div class="structure-hero pt-lg-5 pt-4">
-            <h1 class="titre text-center">Consultation des rapports de visite</h1>
+            <h1 class="titre text-center">
+                <?php
+                if ($_SESSION['habilitation'] == 2) {
+                    echo 'Historique par région - ' . $_SESSION['region'];
+                } elseif ($_SESSION['habilitation'] == 3) {
+                    echo 'Historique par secteur - ' . $_SESSION['secteur'];
+                } else {
+                    echo 'Historique de mes rapports de visite';
+                }
+                ?>
+            </h1>
+            <?php if ($_SESSION['habilitation'] == 2 || $_SESSION['habilitation'] == 3): ?>
+                <p class="text-center text-muted">
+                    <i class="bi bi-info-circle"></i>
+                    <?php
+                    if ($_SESSION['habilitation'] == 3) {
+                        echo 'Consultez les rapports validés de votre secteur';
+                    } else {
+                        echo 'Consultez les rapports validés de votre région';
+                    }
+                    ?>
+                </p>
+            <?php endif; ?>
         </div>
 
         <?php
@@ -77,13 +99,14 @@
                                         ?>
                                     </select>
                                     <small class="text-muted">Optionnel - Filtrer par visiteur spécifique de votre
-                                        région</small>
+                                        <?php echo ($_SESSION['habilitation'] == 3) ? 'secteur' : 'région'; ?></small>
                                 </div>
 
                                 <div class="alert alert-info">
                                     <i class="bi bi-info-circle"></i>
-                                    <strong>Mode Délégué/Responsable :</strong>
-                                    Vous visualisez les rapports de votre région (<?php echo $_SESSION['region']; ?>)
+                                    <strong><?php echo ($_SESSION['habilitation'] == 3) ? 'Mode Responsable Secteur :' : 'Mode Délégué Régional :'; ?></strong>
+                                    Vous visualisez les rapports de votre
+                                    <?php echo ($_SESSION['habilitation'] == 3) ? 'secteur (' . $_SESSION['secteur'] . ')' : 'région (' . $_SESSION['region'] . ')'; ?>
                                 </div>
                             <?php endif; ?>
 

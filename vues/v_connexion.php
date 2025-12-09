@@ -14,7 +14,8 @@ if (isset($_POST['connexion'])) {
             $_SESSION['login'] = $arr['id_log'];
             $_SESSION['matricule'] = $arr['matricule'];
             $_SESSION['erreur'] = false;
-            $_SESSION['region'] = $arr['REG_CODE'];
+            $_SESSION['region'] = $arr['REG_CODE'];     // Code région (ex: "BG")
+            $_SESSION['secteur'] = $arr['SEC_CODE'];    // Code secteur (ex: "O", "S", etc.)
             header('Location: index.php?uc=connexion&action=profil');
         }
     }
@@ -35,11 +36,13 @@ if (isset($_POST['connexion'])) {
                 <?php if (isset($userEmpty)) {
                     echo '<p class="alert alert-danger text-center w-100">' . $userEmpty . '</p>';
                 } ?>
-                <form class="form-signin formulaire m-auto" action="index.php?uc=connexion&action=connexion" method="post">
+                <form class="form-signin formulaire m-auto" action="index.php?uc=connexion&action=connexion"
+                    method="post">
                     <h2 class="form-signin-heading">Se connecter</h2>
                     <input type="text" class="form-control" name="username" placeholder="Identifiant" autofocus="" />
                     <input type="password" class="form-control" name="password" placeholder="Mot de passe" />
-                    <input class="btn btn-lg btn-info btn-block text-light" type="submit" name="connexion" value="Connexion">
+                    <input class="btn btn-lg btn-info btn-block text-light" type="submit" name="connexion"
+                        value="Connexion">
                 </form>
             </div>
         </div>

@@ -31,7 +31,7 @@ function getVisiteursRegion($region)
  * Récupère tous les rapports de visite avec filtres
  * MODIFIÉ : Filtre sur ETAT_CODE = 2 (Validé) au lieu de RAP_ETAT = "valide"
  */
-function getRapportsAvecFiltres($matricule, $dateDebut = null, $dateFin = null, $praticien = null, $region = null, $visiteur = null)
+function getRapportsAvecFiltres($matricule, $dateDebut = null, $dateFin = null, $praticien = null, $region = null, $visiteur = null, $secteur = null)
 {
     try {
         $monPdo = connexionPDO();
@@ -49,22 +49,35 @@ function getRapportsAvecFiltres($matricule, $dateDebut = null, $dateFin = null, 
                     r.MED_DEPOTLEGAL_2,
                     med1.MED_NOMCOMMERCIAL as med1_nom,
                     med2.MED_NOMCOMMERCIAL as med2_nom,
-                    e.ETAT_LIBELLE 
+                    e.ETAT_LIBELLE,
+                    CONCAT(c.COL_NOM, " ", c.COL_PRENOM) as visiteur_nom
                 FROM rapport_visite r
                 INNER JOIN praticien p ON r.PRA_NUM = p.PRA_NUM
+                INNER JOIN collaborateur c ON r.COL_MATRICULE = c.COL_MATRICULE
                 LEFT JOIN motif_visite m ON r.RAP_MOTIF = m.MOT_ID
                 LEFT JOIN medicament med1 ON r.MED_DEPOTLEGAL_1 = med1.MED_DEPOTLEGAL
                 LEFT JOIN medicament med2 ON r.MED_DEPOTLEGAL_2 = med2.MED_DEPOTLEGAL
                 LEFT JOIN etat e ON r.ETAT_CODE = e.ETAT_CODE
-                WHERE r.ETAT_CODE = 1'; // CORRECTION ICI : 2 = Validé
+                WHERE r.ETAT_CODE = 2'; // 2 = Validé (on consulte les rapports validés uniquement)
 
         // Filtres selon le rôle
-        if (!empty($region)) {
-            // Pour les délégués régionaux : voir les rapports de leur région
-            $req .= ' AND r.COL_MATRICULE IN (
-                        SELECT COL_MATRICULE 
-                        FROM collaborateur 
-                        WHERE REG_CODE = :region
+        if (!empty($secteur)) {
+            // Pour les responsables de secteur : voir tous les rapports des régions de leur secteur
+            $req .= ' AND p.PRA_NUM IN (
+                        SELECT p2.PRA_NUM 
+                        FROM praticien p2
+                        JOIN departement d ON CAST(LEFT(p2.PRA_CP, 2) AS UNSIGNED) = d.NoDEPT
+                        JOIN region r ON d.REG_CODE = r.REG_CODE
+                        WHERE r.SEC_CODE = :secteur
+                    )';
+        } elseif (!empty($region)) {
+            // Pour les délégués régionaux : voir les rapports concernant les praticiens de leur région
+            // On filtre par la région du praticien (via son code postal et la table département)
+            $req .= ' AND p.PRA_NUM IN (
+                        SELECT p2.PRA_NUM 
+                        FROM praticien p2
+                        JOIN departement d ON CAST(LEFT(p2.PRA_CP, 2) AS UNSIGNED) = d.NoDEPT
+                        WHERE d.REG_CODE = :region
                     )';
         } else {
             // Pour les visiteurs : seulement leurs rapports
@@ -97,7 +110,9 @@ function getRapportsAvecFiltres($matricule, $dateDebut = null, $dateFin = null, 
         $stmt = $monPdo->prepare($req);
 
         // Bind des paramètres
-        if (!empty($region)) {
+        if (!empty($secteur)) {
+            $stmt->bindParam(':secteur', $secteur, PDO::PARAM_STR);
+        } elseif (!empty($region)) {
             $stmt->bindParam(':region', $region, PDO::PARAM_STR);
         } else {
             $stmt->bindParam(':matricule', $matricule, PDO::PARAM_STR);
@@ -121,6 +136,7 @@ function getRapportsAvecFiltres($matricule, $dateDebut = null, $dateFin = null, 
 
         $stmt->execute();
         $result = $stmt->fetchAll();
+
         return $result;
 
     } catch (PDOException $e) {
@@ -205,18 +221,30 @@ function getEchantillonsDetailRapport($matricule, $numRapport)
 }
 
 /**
- * Récupère tous les praticiens pour le filtre (selon la région du visiteur)
+ * Récupère tous les praticiens pour le filtre (selon la région ou le secteur)
  */
-function getPraticiensPourFiltre($region = null)
+function getPraticiensPourFiltre($region = null, $secteur = null)
 {
     try {
         $monPdo = connexionPDO();
 
-        if (!empty($region)) {
+        if (!empty($secteur)) {
+            // Pour responsables secteur : praticiens de toutes les régions du secteur
+            $req = "SELECT DISTINCT p.PRA_NUM, CONCAT(p.PRA_NOM, ' ', p.PRA_PRENOM) as nom_complet
+                    FROM praticien p
+                    JOIN departement d ON CAST(LEFT(p.PRA_CP, 2) AS UNSIGNED) = d.NoDEPT
+                    JOIN region r ON d.REG_CODE = r.REG_CODE
+                    WHERE r.SEC_CODE = :secteur
+                    ORDER BY p.PRA_NOM, p.PRA_PRENOM";
+
+            $stmt = $monPdo->prepare($req);
+            $stmt->bindParam(':secteur', $secteur, PDO::PARAM_STR);
+            $stmt->execute();
+        } elseif (!empty($region)) {
             // Pour délégués : praticiens de la région
             $req = "SELECT DISTINCT p.PRA_NUM, CONCAT(p.PRA_NOM, ' ', p.PRA_PRENOM) as nom_complet
                     FROM praticien p
-                    JOIN departement d ON LEFT(p.PRA_CP, 2) = d.NoDEPT
+                    JOIN departement d ON CAST(LEFT(p.PRA_CP, 2) AS UNSIGNED) = d.NoDEPT
                     WHERE d.REG_CODE = :region
                     ORDER BY p.PRA_NOM, p.PRA_PRENOM";
 
@@ -230,6 +258,47 @@ function getPraticiensPourFiltre($region = null)
                     ORDER BY PRA_NOM, PRA_PRENOM";
 
             $stmt = $monPdo->query($req);
+        }
+
+        return $stmt->fetchAll();
+
+    } catch (PDOException $e) {
+        print "Erreur !: " . $e->getMessage();
+        die();
+    }
+}
+
+/**
+ * Récupère tous les visiteurs d'une région OU d'un secteur pour le filtre
+ */
+function getVisiteursRegionOuSecteur($region = null, $secteur = null)
+{
+    try {
+        $monPdo = connexionPDO();
+
+        if (!empty($secteur)) {
+            // Pour responsables secteur : tous les visiteurs de toutes les régions du secteur
+            $req = 'SELECT c.COL_MATRICULE, CONCAT(c.COL_NOM, " ", c.COL_PRENOM) as nom_complet
+                    FROM collaborateur c
+                    JOIN region r ON c.REG_CODE = r.REG_CODE
+                    WHERE r.SEC_CODE = :secteur AND c.HAB_ID = 1
+                    ORDER BY c.COL_NOM, c.COL_PRENOM';
+
+            $stmt = $monPdo->prepare($req);
+            $stmt->bindParam(':secteur', $secteur, PDO::PARAM_STR);
+            $stmt->execute();
+        } elseif (!empty($region)) {
+            // Pour délégués : visiteurs de la région uniquement
+            $req = 'SELECT COL_MATRICULE, CONCAT(COL_NOM, " ", COL_PRENOM) as nom_complet
+                    FROM collaborateur
+                    WHERE REG_CODE = :region AND HAB_ID = 1
+                    ORDER BY COL_NOM, COL_PRENOM';
+
+            $stmt = $monPdo->prepare($req);
+            $stmt->bindParam(':region', $region, PDO::PARAM_STR);
+            $stmt->execute();
+        } else {
+            return array();
         }
 
         return $stmt->fetchAll();

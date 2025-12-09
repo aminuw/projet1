@@ -52,11 +52,22 @@ include_once("modele/habilitation.modele.inc.php");
                             <li class="pb-2 dropdown">
                                 <i class='bx-fw bx bxs-chevron-right bx-xs'></i><a class="text-decoration-none text-light py-1" href="#" id="navbarDarkDropdownMenuLink" role="button" data-bs-toggle="dropdown" aria-expanded="false">Rapport de visite</a>
                                 <ul class="dropdown-menu dropdown-menu-dark p-0">
-                                    <!-- Saisir - Tous -->
+                                    <!-- Saisir - Visiteurs et Délégués uniquement -->
+                                    <?php if ($_SESSION['habilitation'] == 1 || $_SESSION['habilitation'] == 2): ?>
                                     <li><a class="dropdown-item" href="index.php?uc=rapport&action=saisir">Saisir un rapport</a></li>
+                                    <?php endif; ?>
                                     
                                     <!-- Consulter mes rapports - Tous -->
-                                    <li><a class="dropdown-item" href="index.php?uc=consultation&action=formulaire">Consulter mes rapports</a></li>
+                                    <li><a class="dropdown-item" href="index.php?uc=consultation&action=mesRapports">Consulter mes rapports</a></li>
+                                    
+                                    <!-- Historique par région/secteur - Délégués et Responsables uniquement -->
+                                    <?php if ($_SESSION['habilitation'] == 2 || $_SESSION['habilitation'] == 3): ?>
+                                    <li>
+                                        <a class="dropdown-item" href="index.php?uc=consultation&action=formulaire">
+                                            <?php echo ($_SESSION['habilitation'] == 3) ? 'Historique par secteur' : 'Historique par région'; ?>
+                                        </a>
+                                    </li>
+                                    <?php endif; ?>
                                     
                                     <!-- Rapport de ma région - Délégué uniquement -->
                                     <?php if (estDelegue()): ?>
@@ -100,3 +111,12 @@ include_once("modele/habilitation.modele.inc.php");
 <script src="assets/js/bootstrap.bundle.min.js"></script>
 <script src="assets/js/isotope.pkgd.js"></script>
 <script src="assets/js/custom.js"></script>
+
+<?php if (isset($_SESSION['erreur_consultation'])): ?>
+<script>
+    alert("<?php echo addslashes($_SESSION['erreur_consultation']); ?>");
+</script>
+<?php 
+    unset($_SESSION['erreur_consultation']);
+endif; 
+?>

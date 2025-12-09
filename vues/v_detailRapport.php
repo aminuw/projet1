@@ -3,7 +3,7 @@
         <div class="structure-hero pt-lg-5 pt-4">
             <h1 class="titre text-center">Détail du rapport de visite</h1>
             <p class="text text-center">
-                Rapport n°<?php echo $rapport['RAP_NUM']; ?> - 
+                Rapport n°<?php echo $rapport['RAP_NUM']; ?> -
                 <?php echo date('d/m/Y', strtotime($rapport['RAP_DATEVISITE'])); ?>
             </p>
         </div>
@@ -20,19 +20,19 @@
                         <div class="row">
                             <div class="col-md-6 mb-3">
                                 <p class="mb-1"><span class="carac">Numéro de rapport :</span></p>
-                                <p class="text-muted">#<?php echo $rapport['RAP_NUM']; ?></p>
+                                <p class="text-muted"><?php echo $rapport['RAP_NUM']; ?></p>
                             </div>
                             <div class="col-md-6 mb-3">
                                 <p class="mb-1"><span class="carac">Date de visite :</span></p>
                                 <p class="text-muted">
-                                    <i class="text"></i> 
+                                    <i class="text"></i>
                                     <?php echo date('d/m/Y', strtotime($rapport['RAP_DATEVISITE'])); ?>
                                 </p>
                             </div>
                             <div class="col-md-6 mb-3">
                                 <p class="mb-1"><span class="carac">Visiteur médical :</span></p>
                                 <p class="text-muted">
-                                    <i class="text"></i> 
+                                    <i class="text"></i>
                                     <?php echo htmlspecialchars($rapport['visiteur_nom']); ?>
                                 </p>
                             </div>
@@ -40,7 +40,7 @@
                                 <p class="mb-1"><span class="carac">Motif de la visite :</span></p>
                                 <p>
                                     <span class="text-muted">
-                                        <?php 
+                                        <?php
                                         if (!empty($rapport['motif'])) {
                                             echo htmlspecialchars($rapport['motif']);
                                         } else {
@@ -71,11 +71,11 @@
                                     <?php echo htmlspecialchars($rapport['praticien_nom']); ?>
                                 </h6>
                                 <p class="text-muted mb-1">
-                                    <i class="text"></i> 
+                                    <i class="text"></i>
                                     <?php echo htmlspecialchars($rapport['PRA_ADRESSE']); ?>
                                 </p>
                                 <p class="text-muted mb-1">
-                                    <?php echo htmlspecialchars($rapport['PRA_CP']); ?> 
+                                    <?php echo htmlspecialchars($rapport['PRA_CP']); ?>
                                     <?php echo htmlspecialchars($rapport['PRA_VILLE']); ?>
                                 </p>
                                 <p class="text-muted">
@@ -83,8 +83,8 @@
                                 </p>
                             </div>
                             <div class="col-md-4 text-end">
-                                <a href="index.php?uc=praticien&action=afficherpraticien&praticien=<?php echo $rapport['PRA_NUM']; ?>" 
-                                   class="btn btn-outline-info">
+                                <a href="index.php?uc=praticien&action=afficherpraticien&praticien=<?php echo $rapport['PRA_NUM']; ?>"
+                                    class="btn btn-outline-info">
                                     <i class="text"></i> Voir la fiche praticien
                                 </a>
                             </div>
@@ -93,8 +93,8 @@
                         <?php if (!empty($rapport['remplacant_nom'])): ?>
                             <hr>
                             <div class="alert alert-info mb-0">
-                                <i class="bi bi-info-circle"></i> 
-                                <strong>Praticien remplaçant :</strong> 
+                                <i class="bi bi-info-circle"></i>
+                                <strong>Praticien remplaçant :</strong>
                                 <?php echo htmlspecialchars($rapport['remplacant_nom']); ?>
                             </div>
                         <?php endif; ?>
@@ -114,15 +114,15 @@
                                         <div class="border rounded p-3 h-100">
                                             <h6 class="carac">Médicament 1</h6>
                                             <p class="mb-1">
-                                                <strong>Dépôt légal :</strong> 
+                                                <strong>Dépôt légal :</strong>
                                                 <?php echo htmlspecialchars($rapport['MED_DEPOTLEGAL_1']); ?>
                                             </p>
                                             <p class="mb-2">
-                                                <strong>Nom commercial :</strong> 
+                                                <strong>Nom commercial :</strong>
                                                 <?php echo htmlspecialchars($rapport['med1_nom']); ?>
                                             </p>
-                                            <a href="index.php?uc=medicaments&action=affichermedoc&medicament=<?php echo $rapport['MED_DEPOTLEGAL_1']; ?>" 
-                                               class="btn btn-sm btn-outline-info">
+                                            <a href="index.php?uc=medicaments&action=affichermedoc&medicament=<?php echo $rapport['MED_DEPOTLEGAL_1']; ?>"
+                                                class="btn btn-sm btn-outline-info">
                                                 <i class="text"></i> Voir la fiche médicament
                                             </a>
                                         </div>
@@ -134,15 +134,15 @@
                                         <div class="border rounded p-3 h-100">
                                             <h6 class="carac">Médicament 2</h6>
                                             <p class="mb-1">
-                                                <strong>Dépôt légal :</strong> 
+                                                <strong>Dépôt légal :</strong>
                                                 <?php echo htmlspecialchars($rapport['MED_DEPOTLEGAL_2']); ?>
                                             </p>
                                             <p class="mb-2">
-                                                <strong>Nom commercial :</strong> 
+                                                <strong>Nom commercial :</strong>
                                                 <?php echo htmlspecialchars($rapport['med2_nom']); ?>
                                             </p>
-                                            <a href="index.php?uc=medicaments&action=affichermedoc&medicament=<?php echo $rapport['MED_DEPOTLEGAL_2']; ?>" 
-                                               class="btn btn-sm btn-outline-info">
+                                            <a href="index.php?uc=medicaments&action=affichermedoc&medicament=<?php echo $rapport['MED_DEPOTLEGAL_2']; ?>"
+                                                class="btn btn-sm btn-outline-info">
                                                 <i class="text"></i> Voir la fiche médicament
                                             </a>
                                         </div>
@@ -151,7 +151,7 @@
                             </div>
                         <?php else: ?>
                             <p class="text-muted text-center mb-0">
-                                <i class="text"></i> 
+                                <i class="text"></i>
                                 Aucun médicament présenté lors de cette visite
                             </p>
                         <?php endif; ?>
@@ -184,8 +184,8 @@
                                                     <span class="text"><?php echo $ech['OFF_QTE']; ?></span>
                                                 </td>
                                                 <td class="text-end">
-                                                    <a href="index.php?uc=medicaments&action=affichermedoc&medicament=<?php echo $ech['MED_DEPOTLEGAL']; ?>" 
-                                                     class="text-muted"> Afficher</i>
+                                                    <a href="index.php?uc=medicaments&action=affichermedoc&medicament=<?php echo $ech['MED_DEPOTLEGAL']; ?>"
+                                                        class="text-muted"> Afficher</i>
                                                     </a>
                                                 </td>
                                             </tr>
@@ -204,20 +204,29 @@
                     </div>
                     <div class="card-body">
                         <div class="text-muted">
-                            <p class="mb-0" style="white-space: pre-wrap;"><?php echo htmlspecialchars($rapport['RAP_BILAN']); ?></p>
+                            <p class="mb-0" style="white-space: pre-wrap;">
+                                <?php echo htmlspecialchars($rapport['RAP_BILAN']); ?>
+                            </p>
                         </div>
                     </div>
                 </div>
 
                 <!-- Bouton retour en bas -->
                 <div class="text-center mb-4">
-                    <a href="index.php?uc=consultation&action=formulaire" class="btn btn-primary px-3">
-                        <i class="texte"></i> Retour aux filtres
-                    </a>
+                    <?php if ($_SESSION['habilitation'] == 1): ?>
+                        <!-- Visiteur : retour à la liste de ses rapports -->
+                        <a href="index.php?uc=consultation&action=mesRapports" class="btn btn-primary px-3">
+                            <i class="texte"></i> Retour à mes rapports
+                        </a>
+                    <?php else: ?>
+                        <!-- Délégué/Responsable : retour au formulaire de recherche -->
+                        <a href="index.php?uc=consultation&action=formulaire" class="btn btn-primary px-3">
+                            <i class="texte"></i> Retour aux filtres
+                        </a>
+                    <?php endif; ?>
                 </div>
 
             </div>
         </div>
     </div>
 </section>
-
