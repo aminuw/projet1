@@ -26,9 +26,9 @@ if (isset($_SESSION['form_data'])) {
                     <div class="alert alert-info" role="alert">
                         <?php echo $_SESSION['confirmation_message']; ?>
                         <form
-                            action="index.php?uc=praticien&action=valideModification&praticien=<?php echo $praticien['PRA_NUM']; ?>&<?php echo http_build_query($_GET); ?>"
+                            action="index.php?uc=praticien&action=valideModification&confirm_spe=true&confirm_type=true"
                             method="post">
-                            <?php foreach ($form_data as $key => $value): ?>
+                            <?php foreach ($_SESSION['form_data'] as $key => $value): ?>
                                 <?php if (is_array($value)): ?>
                                     <?php foreach ($value as $item): ?>
                                         <input type="hidden" name="<?php echo $key; ?>[]" value="<?php echo htmlspecialchars($item); ?>">
@@ -44,7 +44,6 @@ if (isset($_SESSION['form_data'])) {
                     </div>
                     <?php 
                     unset($_SESSION['confirmation_message']); 
-                    unset($_SESSION['form_data']); 
                     ?>
                 <?php endif; ?>
                 <form action="index.php?uc=praticien&action=valideModification" method="post">
@@ -95,8 +94,8 @@ if (isset($_SESSION['form_data'])) {
                         </select>
                     </div>
                     <div class="form-group">
-                        <label>Spécialités</label>
-                        <div class="specialites-checkboxes" style="border: 1px solid #ced4da; border-radius: 0.25rem; padding: 10px; max-height: 200px; overflow-y: auto;">
+                        <label>Spécialités et Coefficient de confiance</label>
+                        <div class="specialites-checkboxes" style="border: 1px solid #ced4da; border-radius: 0.25rem; padding: 10px; max-height: 300px; overflow-y: auto;">
                             <?php 
                             // Récupérer les spécialités actuelles du praticien
                             $specialites_actuelles = isset($form_data['SPE_CODE']) && is_array($form_data['SPE_CODE']) 
@@ -105,22 +104,49 @@ if (isset($_SESSION['form_data'])) {
                                     ? $praticien['SPE_CODE'] 
                                     : []);
                             
+                            // Récupérer les coefficients actuels
+                            $coefficients_actuels = isset($form_data['coef_confiance']) && is_array($form_data['coef_confiance'])
+                                ? $form_data['coef_confiance']
+                                : (isset($praticienCoefs) ? $praticienCoefs : []);
+                            
                             foreach ($lesSpecialites as $specialite) { 
                                 $is_checked = in_array($specialite['SPE_CODE'], $specialites_actuelles);
+                                $coef_value = isset($coefficients_actuels[$specialite['SPE_CODE']]) ? $coefficients_actuels[$specialite['SPE_CODE']] : '0.5';
                             ?>
-                                <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" 
+                                <div class="form-check d-flex align-items-center mb-2">
+                                    <input class="form-check-input me-2" type="checkbox" 
                                            name="spe_code[]" 
                                            value="<?php echo $specialite['SPE_CODE']; ?>" 
                                            id="spe_<?php echo $specialite['SPE_CODE']; ?>"
+                                           onchange="toggleCoefInput(this)"
                                            <?php echo $is_checked ? 'checked' : ''; ?>>
-                                    <label class="form-check-label" for="spe_<?php echo $specialite['SPE_CODE']; ?>">
+                                    <label class="form-check-label flex-grow-1" for="spe_<?php echo $specialite['SPE_CODE']; ?>">
                                         <?php echo $specialite['SPE_LIBELLE']; ?>
                                     </label>
+                                    <input type="number" step="0.01" min="0" max="1" 
+                                           class="form-control form-control-sm ms-2" 
+                                           style="width: 80px; <?php echo !$is_checked ? 'display:none;' : ''; ?>"
+                                           name="coef_confiance[<?php echo $specialite['SPE_CODE']; ?>]" 
+                                           value="<?php echo $coef_value; ?>"
+                                           id="coef_<?php echo $specialite['SPE_CODE']; ?>"
+                                           placeholder="Coef">
                                 </div>
                             <?php } ?>
                         </div>
+                        <small class="form-text text-muted">Le coefficient de confiance (0 à 1) indique le niveau de prescription pour chaque spécialité</small>
                     </div>
+                    
+                    <script>
+                    function toggleCoefInput(checkbox) {
+                        var speCode = checkbox.value;
+                        var coefInput = document.getElementById('coef_' + speCode);
+                        if (checkbox.checked) {
+                            coefInput.style.display = 'block';
+                        } else {
+                            coefInput.style.display = 'none';
+                        }
+                    }
+                    </script>
                     
                     <button type="submit" class="btn btn-primary">Modifier</button>
                 </form>

@@ -18,7 +18,21 @@
                         <p><span class="carac">Prénom</span> : <?php echo $infos['Prenom']; ?></p>
                         <p><span class="carac">Adresse</span> : <?php echo $infos['Adresse']; ?></p>
                         <p><span class="carac">Coefficient de notoriété</span> : <?php echo $infos['Telephone']; ?></p>
-                        <p><span class="carac">Spécialité</span> : <?php if(!empty($specialite)) { echo implode(', ', $specialite); } else { echo 'aucun'; } ?></p>
+                        <p><span class="carac">Spécialitée(s)</span> : <?php if(!empty($specialite)) { echo implode(', ', $specialite); } else { echo 'Aucune(s) spécialitée(s)'; } ?></p>
+                        <p><span class="carac">Coefficient de confiance</span> : 
+                        <?php 
+                        if (!empty($coefConfiance)) {
+                            // Calculer la moyenne des coefficients
+                            $total = 0;
+                            foreach ($coefConfiance as $coef) {
+                                $total += $coef['POS_COEFPRESCRIPTIO'];
+                            }
+                            $moyenne = $total / count($coefConfiance);
+                            echo number_format($moyenne, 2);
+                        } else {
+                            echo 'Non défini';
+                        }
+                        ?></p>
                         <p><span class="carac">Département</span> : <?php echo $infos['Departement']; ?></p>
                         <p><span class="carac">Type Praticien</span> : <?php echo $praticien['TYP_CODE']; ?></p>
 

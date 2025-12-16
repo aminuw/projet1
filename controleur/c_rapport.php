@@ -1,4 +1,8 @@
 <?php
+/*
+ * Controleur rapport - saisie et gestion des rapports de visite
+ * Visiteurs et delegues peuvent saisir, reprendre et valider leurs rapports
+ */
 include_once("modele/rapport.modele.inc.php"); // Ou 'bd.inc.php' selon ton arborescence
 
 if (!isset($_REQUEST['action']) || empty($_REQUEST['action'])) {

@@ -1,5 +1,7 @@
 <?php
-
+/*
+ * Connexion BDD - fonction PDO pour se connecter a gsbfusion
+ */
 session_start();
 
 function connexionPDO()

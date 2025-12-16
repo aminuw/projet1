@@ -1,9 +1,13 @@
 <section class="bg-light">
     <div class="container">
         <div class="structure-hero pt-lg-5 pt-4">
-            <h1 class="titre text-center">Gestion des praticiens <?php echo $name; ?></h1>
+            <h1 class="titre text-center">Consultation des praticiens <?php echo $name; ?></h1>
             <p class="text text-center">
-                Sélectionnez un praticien pour afficher, modifier ses informations, ou ajoutez un nouveau praticien.
+                <?php if (estDelegue() || estResponsable()): ?>
+                Sélectionnez un praticien pour afficher ou modifier ses informations.
+                <?php else: ?>
+                Sélectionnez un praticien pour afficher ses informations.
+                <?php endif; ?>
             </p>
             <?php //var_dump($praticiens); ?>
         </div>
@@ -34,7 +38,9 @@
                     </select>
                     <div class="d-flex justify-content-around mt-3">
                         <button type="submit" class="btn btn-info text-light" onclick="setAction('afficherpraticien')">Afficher les informations</button>
+                        <?php if (estDelegue() || estResponsable()): ?>
                         <button type="submit" class="btn btn-warning" onclick="setAction('modifierpraticien')">Modifier les informations</button>
+                        <?php endif; ?>
                     </div>
                 </form>
                 <div class="mt-3 text-center">

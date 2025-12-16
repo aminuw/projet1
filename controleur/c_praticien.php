@@ -1,4 +1,8 @@
 ﻿<?php
+/*
+ * Controleur praticien - gere l'affichage et modif des praticiens
+ * Actions: gererTous, gererParRegion, gererParSecteur, afficher, ajouter, modifier
+ */
 include_once("modele/praticien.modele.inc.php");
 include_once("modele/habilitation.modele.inc.php");
 
@@ -10,8 +14,8 @@ if (!isset($_REQUEST['action']) || empty($_REQUEST['action'])) {
 
 switch ($action) {
     case 'gererParRegion': {
-        // Seuls les délégués et responsables peuvent accéder
-        if (!estDelegue() && !estResponsable()) {
+        // Seuls les délégués peuvent accéder (par région)
+        if (!estDelegue()) {
             $_SESSION['erreur'] = true;
             header("Location: index.php?uc=accueil");
             exit();
@@ -20,7 +24,22 @@ switch ($action) {
         $loginId = $_SESSION['login'];
         $region = getRegionByLoginId($loginId);
         $praticiens = getAllPraticiensByRegion($region);
-        $name = "(Par Region)";
+        $name = "(Par Région)";
+        include("vues/v_formulairePraticien.php");
+        break;
+    }
+
+    case 'gererParSecteur': {
+        // Seuls les responsables secteur peuvent accéder (par secteur)
+        if (!estResponsable()) {
+            $_SESSION['erreur'] = true;
+            header("Location: index.php?uc=accueil");
+            exit();
+        }
+
+        $secteur = $_SESSION['secteur'];
+        $praticiens = getAllPraticiensBySecteur($secteur);
+        $name = "(Par Secteur)";
         include("vues/v_formulairePraticien.php");
         break;
     }
@@ -32,11 +51,36 @@ switch ($action) {
         break;
     }
 
+    case 'selectionModifier': {
+        // Page de sélection pour modification - filtré par habilitation
+        if (!estDelegue() && !estResponsable()) {
+            $_SESSION['erreur'] = true;
+            header("Location: index.php?uc=accueil");
+            exit();
+        }
+
+        // Filtrer les praticiens selon l'habilitation
+        if (estDelegue()) {
+            $loginId = $_SESSION['login'];
+            $region = getRegionByLoginId($loginId);
+            $praticiens = getAllPraticiensByRegion($region);
+            $filtreInfo = "Praticiens de votre région";
+        } elseif (estResponsable()) {
+            $secteur = $_SESSION['secteur'];
+            $praticiens = getAllPraticiensBySecteur($secteur);
+            $filtreInfo = "Praticiens de votre secteur";
+        }
+
+        include("vues/v_selectionModifierPraticien.php");
+        break;
+    }
+
     case 'afficherpraticien': {
         if (isset($_REQUEST['praticien']) && getPraticienById($_REQUEST['praticien'])) {
             $praticien = getPraticienById($_REQUEST['praticien']);
             $infos = getInfosPraticien($_REQUEST['praticien']);
             $specialite = getSpecialitePraticien($_REQUEST['praticien']);
+            $coefConfiance = getCoefConfiance($_REQUEST['praticien']);
             include("vues/v_afficherPraticien.php");
         } else {
             $_SESSION['erreur'] = true;
@@ -102,7 +146,8 @@ switch ($action) {
                 exit();
             }
 
-            addPraticien($pra_num, $pra_prenom, $pra_nom, $pra_adresse, $pra_cp, $pra_ville, $pra_coefnotoriete, $typ_code, $spe_code);
+            $coef_confiance = isset($_POST['coef_confiance']) && is_array($_POST['coef_confiance']) ? $_POST['coef_confiance'] : [];
+            addPraticien($pra_num, $pra_prenom, $pra_nom, $pra_adresse, $pra_cp, $pra_ville, $pra_coefnotoriete, $typ_code, $spe_code, $coef_confiance);
             unset($_SESSION['form_data']);
             $_SESSION['success_message'] = 'Le praticien a été ajouté avec succès.';
             header('Location: index.php?uc=praticien&action=gererTous');
@@ -147,6 +192,7 @@ switch ($action) {
             $lesSpecialites = getLesSpecialites();
             $lesTypes = getLesTypes();
             $praticien['SPE_CODE'] = getPraticienSpecialty($_REQUEST['praticien']);
+            $praticienCoefs = getPraticienCoefsArray($_REQUEST['praticien']);
             include("vues/v_modifierPraticien.php");
         } else {
             $_SESSION['erreur'] = true;
@@ -205,7 +251,8 @@ switch ($action) {
             }
 
             // Mise à jour du praticien
-            updatePraticien($pra_num, $pra_prenom, $pra_nom, $pra_adresse, $pra_cp, $pra_ville, $pra_coefnotoriete, $typ_code, $spe_code);
+            $coef_confiance = isset($_POST['coef_confiance']) && is_array($_POST['coef_confiance']) ? $_POST['coef_confiance'] : [];
+            updatePraticien($pra_num, $pra_prenom, $pra_nom, $pra_adresse, $pra_cp, $pra_ville, $pra_coefnotoriete, $typ_code, $spe_code, $coef_confiance);
             unset($_SESSION['form_data']);
             $_SESSION['success_message'] = 'Le praticien a été modifié avec succès.';
             header('Location: index.php?uc=praticien&action=gererTous');

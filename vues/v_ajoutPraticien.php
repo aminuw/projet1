@@ -97,36 +97,60 @@
                         </select>
                     </div>
                     <div class="form-group">
-                        <label>Spécialités</label>
+                        <label>Spécialités et Coefficient de confiance</label>
                         <?php
                         $selectedSpe = $form_data['spe_code'] ?? [];
                         if (!is_array($selectedSpe)) {
                             $selectedSpe = $selectedSpe !== '' ? [$selectedSpe] : [];
                         }
+                        $selectedCoefs = $form_data['coef_confiance'] ?? [];
                         ?>
-                        <div class="border rounded p-3" style="max-height: 200px; overflow-y: auto;">
+                        <div class="border rounded p-3" style="max-height: 300px; overflow-y: auto;">
                             <?php if (empty($lesSpecialites)): ?>
                                 <p class="text-muted">Aucune spécialité disponible</p>
                             <?php else: ?>
-                                <?php foreach ($lesSpecialites as $specialite): ?>
-                                    <div class="form-check">
+                                <?php foreach ($lesSpecialites as $specialite): 
+                                    $is_checked = in_array($specialite['SPE_CODE'], $selectedSpe);
+                                    $coef_value = isset($selectedCoefs[$specialite['SPE_CODE']]) ? $selectedCoefs[$specialite['SPE_CODE']] : '0.5';
+                                ?>
+                                    <div class="form-check d-flex align-items-center mb-2">
                                         <input 
                                             type="checkbox" 
-                                            class="form-check-input" 
+                                            class="form-check-input me-2" 
                                             id="spe_<?php echo $specialite['SPE_CODE']; ?>" 
                                             name="spe_code[]" 
                                             value="<?php echo $specialite['SPE_CODE']; ?>"
-                                            <?php echo (in_array($specialite['SPE_CODE'], $selectedSpe)) ? 'checked' : ''; ?>
+                                            onchange="toggleCoefInput(this)"
+                                            <?php echo $is_checked ? 'checked' : ''; ?>
                                         >
-                                        <label class="form-check-label" for="spe_<?php echo $specialite['SPE_CODE']; ?>">
+                                        <label class="form-check-label flex-grow-1" for="spe_<?php echo $specialite['SPE_CODE']; ?>">
                                             <?php echo htmlspecialchars($specialite['SPE_LIBELLE']); ?>
                                         </label>
+                                        <input type="number" step="0.01" min="0" max="1" 
+                                               class="form-control form-control-sm ms-2" 
+                                               style="width: 80px; <?php echo !$is_checked ? 'display:none;' : ''; ?>"
+                                               name="coef_confiance[<?php echo $specialite['SPE_CODE']; ?>]" 
+                                               value="<?php echo $coef_value; ?>"
+                                               id="coef_<?php echo $specialite['SPE_CODE']; ?>"
+                                               placeholder="Coef">
                                     </div>
                                 <?php endforeach; ?>
                             <?php endif; ?>
                         </div>
-                        <small class="form-text text-muted">Sélectionnez une ou plusieurs spécialités</small>
+                        <small class="form-text text-muted">Le coefficient de confiance (0 à 1) indique le niveau de prescription pour chaque spécialité</small>
                     </div>
+                    
+                    <script>
+                    function toggleCoefInput(checkbox) {
+                        var speCode = checkbox.value;
+                        var coefInput = document.getElementById('coef_' + speCode);
+                        if (checkbox.checked) {
+                            coefInput.style.display = 'block';
+                        } else {
+                            coefInput.style.display = 'none';
+                        }
+                    }
+                    </script>
                     <button type="submit" class="btn btn-primary">Ajouter</button>
                     <a href="index.php" class="btn btn-secondary" onclick="return confirm('Êtes-vous sûr de vouloir annuler ? Toutes les modifications non enregistrées seront perdues.');">Annuler</a>
                 </form>

@@ -1,5 +1,8 @@
 <?php
-
+/*
+ * Modele praticien - fonctions BDD pour les praticiens
+ * CRUD praticiens + specialites + coefficients
+ */
 include_once 'bd.inc.php';
 
 function getAllPraticiens()
@@ -54,6 +57,32 @@ function getAllPraticiensByRegion($reg_code)
     }
 }
 
+/**
+ * Récupère tous les praticiens d'un secteur (toutes les régions du secteur)
+ */
+function getAllPraticiensBySecteur($sec_code)
+{
+    try {
+        $monPdo = connexionPDO();
+
+        $req = "
+            SELECT DISTINCT p.PRA_NUM, p.PRA_NOM, p.PRA_PRENOM
+            FROM praticien p
+            JOIN departement d ON CAST(LEFT(p.PRA_CP, 2) AS UNSIGNED) = d.NoDEPT
+            JOIN region r ON d.REG_CODE = r.REG_CODE
+            WHERE r.SEC_CODE = :sec_code
+            ORDER BY p.PRA_NUM
+        ";
+
+        $stmt = $monPdo->prepare($req);
+        $stmt->bindParam(':sec_code', $sec_code, PDO::PARAM_STR);
+        $stmt->execute();
+        return $stmt->fetchAll();
+    } catch (PDOException $e) {
+        die('Erreur SQL (getAllPraticiensBySecteur) : ' . $e->getMessage());
+    }
+}
+
 
 
 function getInfosPraticien($id)
@@ -86,7 +115,7 @@ function getInfosPraticien($id)
 }
 
 
-function addPraticien($pra_num, $pra_prenom, $pra_nom, $pra_adresse, $pra_cp, $pra_ville, $pra_coefnotoriete, $typ_code, $spe_code)
+function addPraticien($pra_num, $pra_prenom, $pra_nom, $pra_adresse, $pra_cp, $pra_ville, $pra_coefnotoriete, $typ_code, $spe_code, $coef_confiance = [])
 {
     try {
         $monPdo = connexionPDO();
@@ -108,20 +137,16 @@ function addPraticien($pra_num, $pra_prenom, $pra_nom, $pra_adresse, $pra_cp, $p
                 if (empty($code)) {
                     continue;
                 }
-                $req = 'SELECT COUNT(*) FROM posseder WHERE PRA_NUM = :pra_num AND SPE_CODE = :spe_code';
+                
+                // Récupérer le coefficient pour cette spécialité, ou 0.5 par défaut
+                $coef = isset($coef_confiance[$code]) ? floatval($coef_confiance[$code]) : 0.5;
+                
+                $req = 'INSERT INTO posseder (PRA_NUM, SPE_CODE, POS_DIPLOME, POS_COEFPRESCRIPTIO) VALUES (:pra_num, :spe_code, \'DU\', :coef)';
                 $stmt = $monPdo->prepare($req);
                 $stmt->bindParam(':pra_num', $pra_num, PDO::PARAM_INT);
                 $stmt->bindParam(':spe_code', $code, PDO::PARAM_STR);
+                $stmt->bindParam(':coef', $coef, PDO::PARAM_STR);
                 $stmt->execute();
-                $count = $stmt->fetchColumn();
-
-                if ($count == 0) {
-                    $req = 'INSERT INTO posseder (PRA_NUM, SPE_CODE, POS_DIPLOME, POS_COEFPRESCRIPTIO) VALUES (:pra_num, :spe_code, \'DU\', 0.5)';
-                    $stmt = $monPdo->prepare($req);
-                    $stmt->bindParam(':pra_num', $pra_num, PDO::PARAM_INT);
-                    $stmt->bindParam(':spe_code', $code, PDO::PARAM_STR);
-                    $stmt->execute();
-                }
             }
         }
     } catch (PDOException $e) {
@@ -175,8 +200,13 @@ function getSpecialitePraticien($id)
     $stmt->execute();
     $result = $stmt->fetchAll(PDO::FETCH_COLUMN);
 
+    // Filtrer les valeurs NULL (quand pas de spécialité via LEFT JOIN)
+    $result = array_filter($result, function($val) {
+        return $val !== null;
+    });
+
     if (empty($result)) {
-        return ["Non spécifiée"];
+        return [];
     }
     return $result;
 }
@@ -209,7 +239,7 @@ function getLesSpecialites()
     }
 }
 
-function updatePraticien($pra_num, $pra_prenom, $pra_nom, $pra_adresse, $pra_cp, $pra_ville, $pra_coefnotoriete, $typ_code, $spe_code)
+function updatePraticien($pra_num, $pra_prenom, $pra_nom, $pra_adresse, $pra_cp, $pra_ville, $pra_coefnotoriete, $typ_code, $spe_code, $coef_confiance = [])
 {
     try {
         $monPdo = connexionPDO();
@@ -239,10 +269,14 @@ function updatePraticien($pra_num, $pra_prenom, $pra_nom, $pra_adresse, $pra_cp,
                     continue;
                 }
 
-                $req = 'INSERT INTO posseder (PRA_NUM, SPE_CODE, POS_DIPLOME, POS_COEFPRESCRIPTIO) VALUES (:pra_num, :spe_code, \'DU\', 0.5)';
+                // Récupérer le coefficient pour cette spécialité, ou 0.5 par défaut
+                $coef = isset($coef_confiance[$code]) ? floatval($coef_confiance[$code]) : 0.5;
+
+                $req = 'INSERT INTO posseder (PRA_NUM, SPE_CODE, POS_DIPLOME, POS_COEFPRESCRIPTIO) VALUES (:pra_num, :spe_code, \'DU\', :coef)';
                 $stmt = $monPdo->prepare($req);
                 $stmt->bindParam(':pra_num', $pra_num, PDO::PARAM_INT);
                 $stmt->bindParam(':spe_code', $code, PDO::PARAM_STR);
+                $stmt->bindParam(':coef', $coef, PDO::PARAM_STR);
                 $stmt->execute();
             }
         }
@@ -251,3 +285,50 @@ function updatePraticien($pra_num, $pra_prenom, $pra_nom, $pra_adresse, $pra_cp,
         die();
     }
 }
+
+/**
+ * Récupère le coefficient de confiance (POS_COEFPRESCRIPTIO) d'un praticien
+ * depuis la table posseder
+ */
+function getCoefConfiance($pra_num)
+{
+    try {
+        $monPdo = connexionPDO();
+        $req = "SELECT s.SPE_LIBELLE, p.POS_COEFPRESCRIPTIO, p.POS_DIPLOME 
+                FROM posseder p
+                JOIN specialite s ON p.SPE_CODE = s.SPE_CODE
+                WHERE p.PRA_NUM = :pra_num";
+        $stmt = $monPdo->prepare($req);
+        $stmt->bindParam(':pra_num', $pra_num, PDO::PARAM_INT);
+        $stmt->execute();
+        return $stmt->fetchAll();
+    } catch (PDOException $e) {
+        print "Erreur !: " . $e->getMessage();
+        die();
+    }
+}
+
+
+/**
+ * Récupère les coefficients de confiance d'un praticien sous forme de tableau associatif
+ * Format: SPE_CODE => POS_COEFPRESCRIPTIO
+ */
+function getPraticienCoefsArray($pra_num)
+{
+    try {
+        $monPdo = connexionPDO();
+        $req = "SELECT SPE_CODE, POS_COEFPRESCRIPTIO FROM posseder WHERE PRA_NUM = :pra_num";
+        $stmt = $monPdo->prepare($req);
+        $stmt->bindParam(':pra_num', $pra_num, PDO::PARAM_INT);
+        $stmt->execute();
+        $result = [];
+        while ($row = $stmt->fetch()) {
+            $result[$row['SPE_CODE']] = $row['POS_COEFPRESCRIPTIO'];
+        }
+        return $result;
+    } catch (PDOException $e) {
+        print "Erreur !: " . $e->getMessage();
+        die();
+    }
+}
+

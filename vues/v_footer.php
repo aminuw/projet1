@@ -29,24 +29,30 @@ include_once("modele/habilitation.modele.inc.php");
                                 <i class='bx-fw bx bxs-chevron-right bx-xs'></i><a class="text-decoration-none text-light py-1" href="index.php?uc=medicaments&action=formulairemedoc">Médicaments</a>
                             </li>
                             
-                            <!-- Praticiens - Délégué et Responsable uniquement -->
-                            <?php if (estDelegue() || estResponsable()): ?>
+                            <!-- Praticiens - Accessible à tous connectés -->
                             <li class="pb-2 dropdown">
                                 <i class='bx-fw bx bxs-chevron-right bx-xs'></i><a class="text-decoration-none text-light py-1" href="#" id="navbarDarkDropdownMenuLinkPraticien" role="button" data-bs-toggle="dropdown" aria-expanded="false">Praticiens</a>
                                 <ul class="dropdown-menu dropdown-menu-dark p-0">
-                                    <!-- Tous Praticiens - Responsable uniquement -->
+                                    <!-- Consulter - Accessible à tous -->
+                                    <li class="dropdown-header">Consulter</li>
+                                    <li><a class="dropdown-item" href="index.php?uc=praticien&action=gererTous">Tous les Praticiens</a></li>
+                                    
+                                    <?php if (estDelegue()): ?>
+                                    <li><a class="dropdown-item" href="index.php?uc=praticien&action=gererParRegion">Par Région</a></li>
+                                    <?php endif; ?>
                                     <?php if (estResponsable()): ?>
-                                    <li><a class="dropdown-item" href="index.php?uc=praticien&action=gererTous">Tous Praticiens</a></li>
+                                    <li><a class="dropdown-item" href="index.php?uc=praticien&action=gererParSecteur">Par Secteur</a></li>
                                     <?php endif; ?>
                                     
-                                    <!-- Par région - Délégué et Responsable -->
-                                    <li><a class="dropdown-item" href="index.php?uc=praticien&action=gererParRegion">Praticien par Région</a></li>
-                                    
-                                    <!-- Ajouter - Délégué et Responsable -->
+                                    <?php if (estDelegue() || estResponsable()): ?>
+                                    <!-- Gérer - Délégué et Responsable uniquement -->
+                                    <li><hr class="dropdown-divider"></li>
+                                    <li class="dropdown-header">Gérer</li>
                                     <li><a class="dropdown-item" href="index.php?uc=praticien&action=ajoutpraticien">Ajouter Praticien</a></li>
+                                    <li><a class="dropdown-item" href="index.php?uc=praticien&action=selectionModifier">Modifier Praticien</a></li>
+                                    <?php endif; ?>
                                 </ul>
                             </li>
-                            <?php endif; ?>
                             
                             <!-- Rapports - Accessible à tous connectés -->
                             <li class="pb-2 dropdown">
