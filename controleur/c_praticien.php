@@ -282,6 +282,43 @@ switch ($action) {
         break;
     }
 
+    case 'getCoefPraticien': {
+        // Vérifier que l'utilisateur est connecté
+        if (!isset($_SESSION['matricule'])) {
+            echo json_encode(['error' => 'Non authentifié']);
+            exit;
+        }
+
+        // Récupérer le numéro du praticien
+        $praNum = $_GET['pra_num'] ?? null;
+
+        if (!$praNum) {
+            echo json_encode(['error' => 'Praticien non spécifié']);
+            exit;
+        }
+
+        try {
+            $monPdo = connexionPDO();
+            $req = 'SELECT PRA_COEFCONF FROM praticien WHERE PRA_NUM = :pra_num';
+            $stmt = $monPdo->prepare($req);
+            $stmt->bindParam(':pra_num', $praNum, PDO::PARAM_INT);
+            $stmt->execute();
+            $result = $stmt->fetch();
+
+            if ($result) {
+                echo json_encode([
+                    'success' => true,
+                    'coef_confiance' => $result['PRA_COEFCONF'] ?? ''
+                ]);
+            } else {
+                echo json_encode(['error' => 'Praticien non trouvé']);
+            }
+        } catch (PDOException $e) {
+            echo json_encode(['error' => 'Erreur base de données: ' . $e->getMessage()]);
+        }
+        exit; // Important pour ne pas inclure de vue
+    }
+
     default: {
         header('Location: index.php?uc=praticien&action=formulairepraticien');
         break;

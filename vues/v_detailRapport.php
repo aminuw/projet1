@@ -81,6 +81,11 @@
                                 <p class="text-muted">
                                     <small>N° Praticien : <?php echo $rapport['PRA_NUM']; ?></small>
                                 </p>
+                                <p class="text-muted">
+                                    <small>Coefficient de confiance :
+                                        <strong><?php echo isset($rapport['PRA_COEFCONF']) ? $rapport['PRA_COEFCONF'] : 'Non renseigné'; ?></strong>
+                                    </small>
+                                </p>
                             </div>
                             <div class="col-md-4 text-end">
                                 <a href="index.php?uc=praticien&action=afficherpraticien&praticien=<?php echo $rapport['PRA_NUM']; ?>"

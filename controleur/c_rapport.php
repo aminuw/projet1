@@ -210,7 +210,7 @@ switch ($action) {
             'medicament1' => $_POST['medicament1'] ?? null,
             'medicament2' => $_POST['medicament2'] ?? null,
             'autre_motif' => $_POST['autre_motif'] ?? '',
-            'etat' => $etat // On passe l'entier (1 ou 2)
+            'etat' => $etat
         );
 
         // Insertion ou mise à jour du rapport
@@ -236,6 +236,21 @@ switch ($action) {
                 }
                 if (!empty($echantillons)) {
                     insertEchantillons($_SESSION['matricule'], $numRapport, $echantillons);
+                }
+            }
+
+            // Mettre à jour le coefficient de confiance du praticien à chaque enregistrement
+            if (!empty($_POST['coef_confiance']) && !empty($_POST['praticien'])) {
+                try {
+                    $monPdo = connexionPDO();
+                    $reqUpdate = 'UPDATE praticien SET PRA_COEFCONF = :coef WHERE PRA_NUM = :pra_num';
+                    $stmtUpdate = $monPdo->prepare($reqUpdate);
+                    $stmtUpdate->bindParam(':coef', $_POST['coef_confiance'], PDO::PARAM_STR);
+                    $stmtUpdate->bindParam(':pra_num', $_POST['praticien'], PDO::PARAM_INT);
+                    $stmtUpdate->execute();
+                } catch (PDOException $e) {
+                    // En cas d'erreur, on continue sans bloquer l'enregistrement du rapport
+                    error_log("Erreur mise à jour coefficient : " . $e->getMessage());
                 }
             }
 
