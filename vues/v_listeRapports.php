@@ -2,6 +2,9 @@
     <div class="container">
         <div class="structure-hero pt-lg-5 pt-4">
             <h1 class="titre text-center">Liste des rapports de visite</h1>
+            <h1 class="titre text-center">(
+                <?php echo ($_SESSION['habilitation'] == 3) ? $_SESSION['secteur'] : $_SESSION['region']; ?> )
+            </h1>
             <p class="text text-center">
                 <?php echo count($rapports); ?> rapport(s) trouvé(s)
             </p>
@@ -39,8 +42,8 @@
                                     <?php foreach ($rapports as $rapport): ?>
                                         <tr>
                                             <!-- Numéro de rapport -->
-                                            <td class="fw-bold">
-                                                #<?php echo $rapport['RAP_NUM']; ?>
+                                            <td class="text-center">
+                                                <?php echo $rapport['RAP_NUM']; ?>
                                             </td>
 
                                             <!-- Date de visite -->
@@ -53,7 +56,6 @@
                                             <!-- Visiteur (seulement pour délégués/responsables) -->
                                             <?php if ($_SESSION['habilitation'] == 2 || $_SESSION['habilitation'] == 3): ?>
                                                 <td>
-                                                    <i class="bi bi-person-badge"></i>
                                                     <?php echo htmlspecialchars($rapport['visiteur_nom']); ?>
                                                     <br>
                                                     <small class="text-muted"><?php echo $rapport['COL_MATRICULE']; ?></small>
@@ -62,13 +64,12 @@
 
                                             <!-- Praticien -->
                                             <td>
-                                                <!-- <a href="index.php?uc=praticien&action=afficherpraticien&praticien=<?php echo $rapport['PRA_NUM']; ?>"  -->
-                                                <class="text-decoration-none" title="Voir le détail du praticien">
-                                                    <i class="text"></i>
+                                                <a href="index.php?uc=praticien&action=afficherpraticien&praticien=<?php echo $rapport['PRA_NUM']; ?>"
+                                                    class="text-decoration-none" title="Voir le détail du praticien">
                                                     <?php echo htmlspecialchars($rapport['praticien_nom']); ?>
-                                                    </a>
-                                                    <br>
-                                                    <small class="text-muted">N° <?php echo $rapport['PRA_NUM']; ?></small>
+                                                </a>
+                                                <br>
+                                                <small class="text-muted">N° <?php echo $rapport['PRA_NUM']; ?></small>
                                             </td>
 
                                             <!-- Motif -->
@@ -111,7 +112,7 @@
                                             <td class="text-center">
                                                 <a href="index.php?uc=consultation&action=detail&num=<?php echo $rapport['RAP_NUM']; ?>&mat=<?php echo $rapport['COL_MATRICULE']; ?>"
                                                     class="btn btn-sm btn-info text-light" title="Voir le détail complet">
-                                                    <i class="text"></i>Détail
+                                                    Détail
                                                 </a>
                                             </td>
                                         </tr>

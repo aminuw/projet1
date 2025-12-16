@@ -10,12 +10,18 @@ if (!isset($_REQUEST['uc']) || empty($_REQUEST['uc']))
 else {
     $uc = $_REQUEST['uc'];
 }
+
+// Détecter si c'est une requête AJAX qui ne doit pas avoir de header/footer
+$isAjax = (isset($_REQUEST['action']) && $_REQUEST['action'] === 'getCoefPraticien');
+
 ?>
 <?php
-if (empty($_SESSION['login'])) {
-    include("vues/v_headerDeconnexion.php");
-} else {
-    include("vues/v_header.php");
+if (!$isAjax) {
+    if (empty($_SESSION['login'])) {
+        include("vues/v_headerDeconnexion.php");
+    } else {
+        include("vues/v_header.php");
+    }
 }
 switch ($uc) {
     case 'accueil': {
@@ -59,6 +65,7 @@ switch ($uc) {
         include("controleur/c_connexion.php");
         break;
     }
+
     default: {
 
         include("vues/v_accueil.php");
@@ -66,10 +73,12 @@ switch ($uc) {
     }
 }
 ?>
-<?php include("vues/v_footer.php");
-ob_end_flush();
+<?php
+if (!$isAjax) {
+    include("vues/v_footer.php");
+    ob_end_flush();
+    ?>
+    </body>
 
-?>
-</body>
-
-</html>
+    </html>
+<?php } ?>

@@ -74,10 +74,19 @@ include_once("modele/habilitation.modele.inc.php");
                                     </a>
                                 </li>
                                 <?php endif; ?>
+                                <?php if ($_SESSION['habilitation'] == 3): ?>
                                 <li>
+                                    <a class="dropdown-item" href="index.php?uc=rapport&action=saisir">
+                                        <i class="navbar-toggler border-0"></i> Nouveau rapport de région
+                                    </a>
+                                </li>
+                                <?php endif; ?>
+                                <li>
+                                    <?php if ($_SESSION['habilitation'] == 1 || $_SESSION['habilitation'] == 2): ?>
                                     <a class="dropdown-item" href="index.php?uc=consultation&action=mesRapports">
                                         <i class="navbar-toggler border-0"></i> Consulter mes rapports
                                     </a>
+                                    <?php endif; ?>
                                 </li>
                                 <?php if ($_SESSION['habilitation'] == 2 || $_SESSION['habilitation'] == 3): ?>
                                 <li>

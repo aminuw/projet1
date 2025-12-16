@@ -58,7 +58,9 @@ include_once("modele/habilitation.modele.inc.php");
                                     <?php endif; ?>
                                     
                                     <!-- Consulter mes rapports - Tous -->
+                                    <?php if ($_SESSION['habilitation'] == 1 || $_SESSION['habilitation'] == 2): ?>
                                     <li><a class="dropdown-item" href="index.php?uc=consultation&action=mesRapports">Consulter mes rapports</a></li>
+                                    <?php endif; ?>
                                     
                                     <!-- Historique par région/secteur - Délégués et Responsables uniquement -->
                                     <?php if ($_SESSION['habilitation'] == 2 || $_SESSION['habilitation'] == 3): ?>

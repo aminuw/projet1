@@ -3,15 +3,15 @@
 include_once 'bd.inc.php';
 
 /**
- * Récupère le prochain numéro de rapport pour un collaborateur
+ * Récupère le prochain numéro de rapport GLOBAL (pour tous les utilisateurs)
  */
 function getNextNumeroRapport($matricule)
 {
     try {
         $monPdo = connexionPDO();
-        $req = 'SELECT COALESCE(MAX(RAP_NUM), 0) + 1 as prochain FROM rapport_visite WHERE COL_MATRICULE = :matricule';
+        // Récupère le MAX de RAP_NUM sur TOUS les rapports (pas seulement ceux de l'utilisateur)
+        $req = 'SELECT COALESCE(MAX(RAP_NUM), 0) + 1 as prochain FROM rapport_visite';
         $stmt = $monPdo->prepare($req);
-        $stmt->bindParam(':matricule', $matricule, PDO::PARAM_STR);
         $stmt->execute();
         $result = $stmt->fetch();
         return $result['prochain'];
@@ -191,14 +191,16 @@ function getRapportsEnCours($matricule)
 }
 
 /**
- * Récupère un rapport spécifique
+ * Récupère un rapport spécifique avec le coefficient du praticien
  */
 function getRapportById($matricule, $numRapport)
 {
     try {
         $monPdo = connexionPDO();
-        $req = 'SELECT * FROM rapport_visite 
-                WHERE COL_MATRICULE = :matricule AND RAP_NUM = :num';
+        $req = 'SELECT r.*, p.PRA_COEFCONF 
+                FROM rapport_visite r
+                LEFT JOIN praticien p ON r.PRA_NUM = p.PRA_NUM
+                WHERE r.COL_MATRICULE = :matricule AND r.RAP_NUM = :num';
 
         $stmt = $monPdo->prepare($req);
         $stmt->bindParam(':matricule', $matricule, PDO::PARAM_STR);
@@ -311,7 +313,6 @@ function updateRapportVisite($data)
         $autre_motif = !empty($data['autre_motif']) ? $data['autre_motif'] : '';
         $stmt->bindParam(':autre_motif', $autre_motif, PDO::PARAM_STR);
 
-        // ICI : Update avec l'int
         $stmt->bindParam(':etat_code', $etatCode, PDO::PARAM_INT);
 
         $result = $stmt->execute();
