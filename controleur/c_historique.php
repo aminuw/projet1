@@ -1,4 +1,8 @@
 <?php
+/*
+ * Controleur historique - consultation des rapports valides
+ * Filtres par date, praticien, visiteur selon habilitation
+ */
 include_once("modele/historique.modele.inc.php");
 
 if (!isset($_REQUEST['action']) || empty($_REQUEST['action'])) {

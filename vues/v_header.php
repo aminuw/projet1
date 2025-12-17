@@ -40,25 +40,39 @@ include_once("modele/habilitation.modele.inc.php");
                                 href="index.php?uc=medicaments&action=formulairemedoc">Médicaments</a>
                         </li>
                         <li class="nav-item dropdown">
-                            <?php if (estDelegue() || estResponsable()): ?>
                             <a class="nav-link dropdown-toggle btn-outline-info rounded-pill px-3 fw-bold" href="#"
                                 id="praticienDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                Gérer Praticien
+                                Praticien
                             </a>
                             <ul class="dropdown-menu" aria-labelledby="praticienDropdown">
-                                <?php if (estResponsable()|| estDelegue()): ?>
-                                <li><a class="dropdown-item" href="index.php?uc=praticien&action=gererTous">Tous Praticiens</a></li>
+                                <!-- Section Consulter - visible pour tous -->
+                                <li class="dropdown-header text-muted">Consulter</li>
+                                <li><a class="dropdown-item" href="index.php?uc=praticien&action=gererTous">
+                                    <i class="bi bi-list-ul me-2"></i>Tous les Praticiens
+                                </a></li>
+                                <?php if (estDelegue()): ?>
+                                <li><a class="dropdown-item" href="index.php?uc=praticien&action=gererParRegion">
+                                    <i class="bi bi-geo-alt me-2"></i>Par Région
+                                </a></li>
+                                <?php endif; ?>
+                                <?php if (estResponsable()): ?>
+                                <li><a class="dropdown-item" href="index.php?uc=praticien&action=gererParSecteur">
+                                    <i class="bi bi-geo-alt me-2"></i>Par Secteur
+                                </a></li>
                                 <?php endif; ?>
                                 
                                 <?php if (estDelegue() || estResponsable()): ?>
-                                <li><a class="dropdown-item" href="index.php?uc=praticien&action=gererParRegion">Praticien par Région</a></li>
-                                <?php endif; ?>
-                                
-                                <?php if (estDelegue() || estResponsable()): ?>
-                                <li><a class="dropdown-item" href="index.php?uc=praticien&action=ajoutpraticien">Ajouter Praticien</a></li>
+                                <!-- Séparateur et Section Gérer - uniquement Délégué/Responsable -->
+                                <li><hr class="dropdown-divider"></li>
+                                <li class="dropdown-header text-muted">Gérer</li>
+                                <li><a class="dropdown-item" href="index.php?uc=praticien&action=ajoutpraticien">
+                                    <i class="bi bi-plus-circle me-2"></i>Ajouter Praticien
+                                </a></li>
+                                <li><a class="dropdown-item" href="index.php?uc=praticien&action=selectionModifier">
+                                    <i class="bi bi-pencil-square me-2"></i>Modifier Praticien
+                                </a></li>
                                 <?php endif; ?>
                             </ul>
-                            <?php endif; ?>
                         </li>
                         <li class="nav-item dropdown mx-2">
                             <a class="nav-link btn-outline-info rounded-pill px-3 fw-bold dropdown-toggle" href="#"

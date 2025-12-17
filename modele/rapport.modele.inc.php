@@ -1,5 +1,8 @@
 <?php
-
+/*
+ * Modele rapport - fonctions pour la gestion des rapports de visite
+ * Insert, update, get rapports + echantillons medicaments
+ */
 include_once 'bd.inc.php';
 
 /**

@@ -1,4 +1,7 @@
 <?php
+/*
+ * Controleur medicaments - recherche et affichage des medocs
+ */
 if (!isset($_REQUEST['action']) || empty($_REQUEST['action'])) {
 	$action = "formulairemedoc";
 } else {

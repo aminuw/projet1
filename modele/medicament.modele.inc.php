@@ -1,5 +1,8 @@
 <?php
-
+/*
+ * Modele medicament - recherche et infos des medicaments
+ * Recup par depot legal ou par nom commercial
+ */
 include_once 'bd.inc.php';
 
     function getAllNomMedicament(){

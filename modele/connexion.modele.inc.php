@@ -1,5 +1,8 @@
 <?php
-
+/*
+ * Modele connexion - authentification et infos collaborateurs
+ * Login, verification matricule, recup region/secteur
+ */
 include_once 'bd.inc.php';
 
 function getAllInformationCompte($matricule)

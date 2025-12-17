@@ -1,5 +1,8 @@
 <?php
-
+/*
+ * Modele historique - consultation des rapports valides
+ * Recupere rapports avec filtres (date, praticien, visiteur)
+ */
 include_once 'bd.inc.php';
 
 /**
