@@ -58,7 +58,7 @@ function getRapportsAvecFiltres($matricule, $dateDebut = null, $dateFin = null, 
                 LEFT JOIN medicament med1 ON r.MED_DEPOTLEGAL_1 = med1.MED_DEPOTLEGAL
                 LEFT JOIN medicament med2 ON r.MED_DEPOTLEGAL_2 = med2.MED_DEPOTLEGAL
                 LEFT JOIN etat e ON r.ETAT_CODE = e.ETAT_CODE
-                WHERE r.ETAT_CODE = 2'; // 2 = Validé (on consulte les rapports validés uniquement)
+                WHERE r.ETAT_CODE = 2';
 
         // Filtres selon le rôle
         if (!empty($secteur)) {
