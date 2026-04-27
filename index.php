@@ -60,6 +60,14 @@ switch ($uc) {
         }
         break;
     }
+    case 'statistiques': {
+        if (!empty($_SESSION['login'])) {
+            include("controleur/c_statistiques.php");
+        } else {
+            include("vues/v_accesInterdit.php");
+        }
+        break;
+    }
 
     case 'connexion': {
         include("controleur/c_connexion.php");

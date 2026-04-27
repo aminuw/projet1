@@ -117,6 +117,14 @@ endif; ?>
                                 </li>
                                 <?php
 endif; ?>
+                                <?php if ($_SESSION['habilitation'] == 3): ?>
+                                <li>
+                                    <a class="dropdown-item" href="index.php?uc=statistiques">
+                                        <i class="navbar-toggler border-0"></i> Statistiques de mon secteur
+                                    </a>
+                                </li>
+                                <?php
+endif; ?>
                             </ul>
                         </li>
                         <li class="nav-item mx-2">

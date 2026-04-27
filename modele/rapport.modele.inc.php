@@ -372,4 +372,55 @@ function deleteEchantillonsRapport($matricule, $numRapport)
     }
 }
 
+/**
+ * Récupère les statistiques des médicaments offerts lors des visites d'un secteur
+ * @param string $secCode Code du secteur
+ * @param string $dateDebut Date de début (format Y-m-d)
+ * @param string $dateFin Date de fin (format Y-m-d)
+ * @param string|null $medDepotLegal Dépôt légal du médicament (optionnel, pour filtrer sur un médicament)
+ * @return array Statistiques par médicament (nom, nombre de fois offert)
+ */
+function getStatistiquesEchantillonsSecteur($secCode, $dateDebut, $dateFin, $medDepotLegal = null)
+{
+    try {
+        $pdo = connexionPDO();
+
+        $sql = 'SELECT m.MED_DEPOTLEGAL, m.MED_NOMCOMMERCIAL, m.FAM_CODE, f.FAM_LIBELLE,
+                       SUM(o.OFF_QTE) as TOTAL_QUANTITE,
+                       COUNT(DISTINCT CONCAT(o.COL_MATRICULE, "-", o.RAP_NUM)) as NB_VISITES
+                FROM offrir o
+                INNER JOIN rapport_visite r ON o.COL_MATRICULE = r.COL_MATRICULE AND o.RAP_NUM = r.RAP_NUM
+                INNER JOIN collaborateur c ON r.COL_MATRICULE = c.COL_MATRICULE
+                INNER JOIN region reg ON c.REG_CODE = reg.REG_CODE
+                INNER JOIN medicament m ON o.MED_DEPOTLEGAL = m.MED_DEPOTLEGAL
+                INNER JOIN famille f ON m.FAM_CODE = f.FAM_CODE
+                WHERE reg.SEC_CODE = :secCode
+                AND r.ETAT_CODE = 2
+                AND r.RAP_DATEVISITE BETWEEN :dateDebut AND :dateFin';
+
+        if ($medDepotLegal !== null && $medDepotLegal !== '') {
+            $sql .= ' AND o.MED_DEPOTLEGAL = :medDepotLegal';
+        }
+
+        $sql .= ' GROUP BY m.MED_DEPOTLEGAL, m.MED_NOMCOMMERCIAL, m.FAM_CODE, f.FAM_LIBELLE
+                  ORDER BY TOTAL_QUANTITE DESC';
+
+        $stmt = $pdo->prepare($sql);
+        $stmt->bindValue(':secCode', $secCode, PDO::PARAM_STR);
+        $stmt->bindValue(':dateDebut', $dateDebut, PDO::PARAM_STR);
+        $stmt->bindValue(':dateFin', $dateFin, PDO::PARAM_STR);
+
+        if ($medDepotLegal !== null && $medDepotLegal !== '') {
+            $stmt->bindValue(':medDepotLegal', $medDepotLegal, PDO::PARAM_STR);
+        }
+
+        $stmt->execute();
+
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    } catch (PDOException $e) {
+        print "Erreur ! : " . $e->getMessage();
+        die();
+    }
+}
+
 ?>
