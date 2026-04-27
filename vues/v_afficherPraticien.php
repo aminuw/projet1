@@ -10,8 +10,7 @@
             
             <div class="test col-12 col-sm-8 col-lg-6 col-xl-5 col-xxl-4 py-lg-5 py-3">
                 <div class="formulaire"><?php
-                //var_dump($praticien);
-                //var_dump($specialite);
+                var_dump($praticien);
                 // var_dump($infos);
                     if (!empty($infos)) : ?>
                         <p><span class="carac">Nom</span> : <?php echo $infos['Nom']; ?></p>

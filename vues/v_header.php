@@ -54,12 +54,14 @@ include_once("modele/habilitation.modele.inc.php");
                                 <li><a class="dropdown-item" href="index.php?uc=praticien&action=gererParRegion">
                                     <i class="bi bi-geo-alt me-2"></i>Par Région
                                 </a></li>
-                                <?php endif; ?>
+                                <?php
+endif; ?>
                                 <?php if (estResponsable()): ?>
                                 <li><a class="dropdown-item" href="index.php?uc=praticien&action=gererParSecteur">
                                     <i class="bi bi-geo-alt me-2"></i>Par Secteur
                                 </a></li>
-                                <?php endif; ?>
+                                <?php
+endif; ?>
                                 
                                 <?php if (estDelegue() || estResponsable()): ?>
                                 <!-- Séparateur et Section Gérer - uniquement Délégué/Responsable -->
@@ -71,7 +73,8 @@ include_once("modele/habilitation.modele.inc.php");
                                 <li><a class="dropdown-item" href="index.php?uc=praticien&action=selectionModifier">
                                     <i class="bi bi-pencil-square me-2"></i>Modifier Praticien
                                 </a></li>
-                                <?php endif; ?>
+                                <?php
+endif; ?>
                             </ul>
                         </li>
                         <li class="nav-item dropdown mx-2">
@@ -87,29 +90,33 @@ include_once("modele/habilitation.modele.inc.php");
                                         <i class="navbar-toggler border-0"></i> Saisir un rapport
                                     </a>
                                 </li>
-                                <?php endif; ?>
+                                <?php
+endif; ?>
                                 <?php if ($_SESSION['habilitation'] == 3): ?>
                                 <li>
                                     <a class="dropdown-item" href="index.php?uc=rapport&action=saisir">
                                         <i class="navbar-toggler border-0"></i> Nouveau rapport de région
                                     </a>
                                 </li>
-                                <?php endif; ?>
+                                <?php
+endif; ?>
                                 <li>
                                     <?php if ($_SESSION['habilitation'] == 1 || $_SESSION['habilitation'] == 2): ?>
                                     <a class="dropdown-item" href="index.php?uc=consultation&action=mesRapports">
                                         <i class="navbar-toggler border-0"></i> Consulter mes rapports
                                     </a>
-                                    <?php endif; ?>
+                                    <?php
+endif; ?>
                                 </li>
                                 <?php if ($_SESSION['habilitation'] == 2 || $_SESSION['habilitation'] == 3): ?>
                                 <li>
                                     <a class="dropdown-item" href="index.php?uc=consultation&action=formulaire">
                                         <i class="navbar-toggler border-0"></i> 
-                                        <?php echo ($_SESSION['habilitation'] == 3) ? 'Historique par secteur' : 'Historique par région'; ?>
+                                        <?php echo($_SESSION['habilitation'] == 3) ? 'Historique par secteur' : 'Historique par région'; ?>
                                     </a>
                                 </li>
-                                <?php endif; ?>
+                                <?php
+endif; ?>
                             </ul>
                         </li>
                         <li class="nav-item mx-2">

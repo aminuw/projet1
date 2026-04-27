@@ -1,4 +1,4 @@
-<?php
+    <?php
 // Les praticiens sont filtrés selon l'habilitation dans le contrôleur
 ?>
 <section class="bg-light">
@@ -9,7 +9,8 @@
                 Sélectionnez un praticien dans la liste pour modifier ses informations.
                 <?php if (isset($filtreInfo) && !empty($filtreInfo)): ?>
                 <br><small class="text-muted"><?php echo $filtreInfo; ?></small>
-                <?php endif; ?>
+                <?php
+endif; ?>
             </p>
         </div>
         <div class="row align-items-center justify-content-center">
@@ -22,13 +23,15 @@
                         Un problème est survenu lors de la sélection du praticien
                     </div>
                     <?php $_SESSION['erreur'] = false; ?>
-                <?php endif; ?>
+                <?php
+endif; ?>
                 
                 <?php if (empty($praticiens)): ?>
                     <div class="alert alert-warning" role="alert">
                         <i class="bi bi-exclamation-triangle"></i> Aucun praticien disponible pour votre zone.
                     </div>
-                <?php else: ?>
+                <?php
+else: ?>
                     <form id="modifierPraticienForm" action="index.php?uc=praticien&action=modifierpraticien" method="post" class="formulaire-recherche col-12 m-0">
                         <label class="titre-formulaire" for="praticien">Praticiens disponibles :</label>
                         <select required name="praticien" id="praticien" class="form-select mt-3">
@@ -37,7 +40,8 @@
                                 <option value="<?php echo $pra['PRA_NUM']; ?>" class="form-control">
                                     <?php echo $pra['PRA_NUM'] . ' - ' . $pra['PRA_NOM'] . ' ' . $pra['PRA_PRENOM']; ?>
                                 </option>
-                            <?php endforeach; ?>
+                            <?php
+    endforeach; ?>
                         </select>
                         <div class="d-flex justify-content-center mt-4">
                             <button type="submit" class="btn btn-warning px-4">
@@ -51,7 +55,8 @@
                             <i class="bi bi-arrow-left me-1"></i>Retour à la liste
                         </a>
                     </div>
-                <?php endif; ?>
+                <?php
+endif; ?>
             </div>
         </div>
     </div>

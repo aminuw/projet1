@@ -36,15 +36,17 @@
                         }
                         ?>
                     </select>
-                    <div class="d-flex justify-content-around mt-3">
+                    <div class="d-flex justify-content-center mt-3">
                         <button type="submit" class="btn btn-info text-light" onclick="setAction('afficherpraticien')">Afficher les informations</button>
-                        <?php if (estDelegue() || estResponsable()): ?>
-                        <button type="submit" class="btn btn-warning" onclick="setAction('modifierpraticien')">Modifier les informations</button>
-                        <?php endif; ?>
                     </div>
                 </form>
+                <?php if (estDelegue() || estResponsable()): ?>
                 <div class="mt-3 text-center">
+                    <a href="index.php?uc=praticien&action=selectionModifier" class="btn btn-warning">
+                        <i class="bi bi-pencil-square me-1"></i>Modifier un praticien
+                    </a>
                 </div>
+                <?php endif; ?>
             </div>
         </div>
     </div>
