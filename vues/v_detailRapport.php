@@ -83,7 +83,7 @@
                                 </p>
                                 <p class="text-muted">
                                     <small>Coefficient de confiance :
-                                        <strong><?php echo isset($rapport['PRA_COEFCONF']) ? $rapport['PRA_COEFCONF'] : 'Non renseigné'; ?></strong>
+                                        <strong><?php echo isset($rapport['PRA_COEFNOTORIETE']) ? $rapport['PRA_COEFNOTORIETE'] : 'Non renseigné'; ?></strong>
                                     </small>
                                 </p>
                             </div>

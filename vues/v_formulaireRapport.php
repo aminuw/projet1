@@ -236,7 +236,7 @@
                                 class="text-danger">*</span></label>
                         <input type="number" class="form-control" id="coef_confiance" name="coef_confiance" max="1000"
                             min="0" step="0.1" required placeholder="Notez le niveau de confiance..."
-                            value="<?php echo isset($rapportEnCours['PRA_COEFCONF']) ? $rapportEnCours['PRA_COEFCONF'] : ''; ?>">
+                            value="<?php echo isset($rapportEnCours['PRA_COEFNOTORIETE']) ? $rapportEnCours['PRA_COEFNOTORIETE'] : ''; ?>">
                     </div>
 
                     <!-- Case à cocher "Saisie définitive" -->

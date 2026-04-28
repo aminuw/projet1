@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 /*
  * Controleur praticien - gere l'affichage et modif des praticiens
  * Actions: gererTous, gererParRegion, gererParSecteur, afficher, ajouter, modifier
@@ -299,7 +299,7 @@ switch ($action) {
 
         try {
             $monPdo = connexionPDO();
-            $req = 'SELECT PRA_COEFCONF FROM praticien WHERE PRA_NUM = :pra_num';
+            $req = 'SELECT PRA_COEFNOTORIETE FROM praticien WHERE PRA_NUM = :pra_num';
             $stmt = $monPdo->prepare($req);
             $stmt->bindParam(':pra_num', $praNum, PDO::PARAM_INT);
             $stmt->execute();
@@ -308,7 +308,7 @@ switch ($action) {
             if ($result) {
                 echo json_encode([
                     'success' => true,
-                    'coef_confiance' => $result['PRA_COEFCONF'] ?? ''
+                    'coef_confiance' => $result['PRA_COEFNOTORIETE'] ?? ''
                 ]);
             } else {
                 echo json_encode(['error' => 'Praticien non trouvé']);

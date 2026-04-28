@@ -243,7 +243,7 @@ switch ($action) {
             if (!empty($_POST['coef_confiance']) && !empty($_POST['praticien'])) {
                 try {
                     $monPdo = connexionPDO();
-                    $reqUpdate = 'UPDATE praticien SET PRA_COEFCONF = :coef WHERE PRA_NUM = :pra_num';
+                    $reqUpdate = 'UPDATE praticien SET PRA_COEFNOTORIETE = :coef WHERE PRA_NUM = :pra_num';
                     $stmtUpdate = $monPdo->prepare($reqUpdate);
                     $stmtUpdate->bindParam(':coef', $_POST['coef_confiance'], PDO::PARAM_STR);
                     $stmtUpdate->bindParam(':pra_num', $_POST['praticien'], PDO::PARAM_INT);

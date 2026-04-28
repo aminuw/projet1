@@ -163,7 +163,7 @@ function getDetailRapport($matricule, $numRapport)
                     p.PRA_ADRESSE,
                     p.PRA_CP,
                     p.PRA_VILLE,
-                    p.PRA_COEFCONF,
+                    p.PRA_COEFNOTORIETE,
                     CONCAT(p2.PRA_NOM, " ", p2.PRA_PRENOM) as remplacant_nom,
                     m.MOT_LIBELLE as motif,
                     med1.MED_NOMCOMMERCIAL as med1_nom,

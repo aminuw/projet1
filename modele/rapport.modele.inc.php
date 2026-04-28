@@ -200,7 +200,7 @@ function getRapportById($matricule, $numRapport)
 {
     try {
         $monPdo = connexionPDO();
-        $req = 'SELECT r.*, p.PRA_COEFCONF 
+        $req = 'SELECT r.*, p.PRA_COEFNOTORIETE 
                 FROM rapport_visite r
                 LEFT JOIN praticien p ON r.PRA_NUM = p.PRA_NUM
                 WHERE r.COL_MATRICULE = :matricule AND r.RAP_NUM = :num';
