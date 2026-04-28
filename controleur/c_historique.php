@@ -54,8 +54,13 @@ switch ($action) {
             // Délégué : filtre par région
             $region = $_SESSION['region'];
         } elseif ($_SESSION['habilitation'] == 3) {
-            // Responsable secteur : filtre par secteur
+            // Responsable secteur : filtre par secteur par défaut
             $secteur = $_SESSION['secteur'];
+            // Si une région spécifique est demandée (via le lien "Nouveaux rapports de sa région")
+            if (isset($_REQUEST['region']) && !empty($_REQUEST['region'])) {
+                $region = $_REQUEST['region'];
+                $secteur = null;
+            }
         }
 
         // Récupérer les rapports
@@ -71,8 +76,8 @@ switch ($action) {
 
         // Vérifier si des rapports existent
         if (empty($rapports)) {
-            $_SESSION['erreur_consultation'] = "Aucun rapport trouvé pour cette période.";
-            header('Location: index.php?uc=consultation&action=formulaire');
+            $succes = "Erreur pas de rapport";
+            include("vues/v_problemeSurvenu.php");
             exit();
         }
 
@@ -94,8 +99,8 @@ switch ($action) {
 
         // Vérifier si des rapports existent
         if (empty($rapports)) {
-            $_SESSION['erreur_consultation'] = "Vous n'avez aucun rapport de visite.";
-            header('Location: index.php?uc=accueil');
+            $succes = "Erreur pas de rapport";
+            include("vues/v_problemeSurvenu.php");
             exit();
         }
 
@@ -126,7 +131,7 @@ switch ($action) {
         $matricule = $_GET['mat'];
 
         // Vérifier les droits d'accès
-        if ($_SESSION['habilitation'] != 2 && $matricule != $_SESSION['matricule']) {
+        if ($_SESSION['habilitation'] != 2 && $_SESSION['habilitation'] != 3 && $matricule != $_SESSION['matricule']) {
             $_SESSION['erreur_consultation'] = "Vous n'avez pas accès à ce rapport.";
             header('Location: index.php?uc=consultation&action=formulaire');
             exit();

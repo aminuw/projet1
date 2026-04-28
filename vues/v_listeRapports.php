@@ -3,7 +3,15 @@
         <div class="structure-hero pt-lg-5 pt-4">
             <h1 class="titre text-center">Liste des rapports de visite</h1>
             <h1 class="titre text-center">(
-                <?php echo ($_SESSION['habilitation'] == 3) ? $_SESSION['secteur'] : $_SESSION['region']; ?> )
+                <?php 
+                if ($_SESSION['habilitation'] == 3 && !isset($_REQUEST['region'])) {
+                    echo $_SESSION['secteur'];
+                } elseif (isset($_REQUEST['region'])) {
+                    echo $_REQUEST['region'];
+                } else {
+                    echo $_SESSION['region'];
+                }
+                ?> )
             </h1>
             <p class="text text-center">
                 <?php echo count($rapports); ?> rapport(s) trouvé(s)
