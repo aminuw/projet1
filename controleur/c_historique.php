@@ -131,7 +131,9 @@ switch ($action) {
         $matricule = $_GET['mat'];
 
         // Vérifier les droits d'accès
-        if ($_SESSION['habilitation'] != 2 && $_SESSION['habilitation'] != 3 && $matricule != $_SESSION['matricule']) {
+        // hab 1 (visiteur) : seulement ses propres rapports
+        // hab 2 (délégué) et hab 3 (responsable) : accès à tous les rapports
+        if ($_SESSION['habilitation'] == 1 && $matricule != $_SESSION['matricule']) {
             $_SESSION['erreur_consultation'] = "Vous n'avez pas accès à ce rapport.";
             header('Location: index.php?uc=consultation&action=formulaire');
             exit();
