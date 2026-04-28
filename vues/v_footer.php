@@ -79,7 +79,7 @@ include_once("modele/habilitation.modele.inc.php");
                                     
                                     <!-- Rapports de la région - Délégués et Responsables -->
                                     <?php if (estDelegue() || estResponsable()): ?>
-                                    <li><a class="dropdown-item" href="index.php?uc=consultation&action=liste&region=<?php echo $_SESSION['region']; ?>">Nouveaux rapports de sa région</a></li>
+                                    <li><a class="dropdown-item" href="index.php?uc=consultation&action=liste&region=<?php echo htmlspecialchars($_SESSION['region'] ?? ''); ?>">Nouveaux rapports de sa région</a></li>
                                     <?php endif; ?>
                                 </ul>
                             </li>

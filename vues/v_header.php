@@ -97,7 +97,7 @@ include_once("modele/habilitation.modele.inc.php");
                                 <?php if ($_SESSION['habilitation'] == 3): ?>
                                     <li>
                                         <a class="dropdown-item"
-                                            href="index.php?uc=consultation&action=liste&region=<?php echo $_SESSION['region']; ?>">
+                                            href="index.php?uc=consultation&action=liste&region=<?php echo htmlspecialchars($_SESSION['region'] ?? ''); ?>">
                                             <i class="navbar-toggler border-0"></i> Nouveaux rapports de sa région
                                         </a>
                                     </li>
