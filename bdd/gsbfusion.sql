@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Hôte : 127.0.0.1:3307
--- Généré le : mar. 28 avr. 2026 à 06:28
+-- Généré le : mar. 05 mai 2026 à 09:10
 -- Version du serveur : 11.5.2-MariaDB
 -- Version de PHP : 8.3.14
 
@@ -257,7 +257,7 @@ CREATE TABLE IF NOT EXISTS `etat` (
   `ETAT_CODE` int(11) NOT NULL,
   `ETAT_LIBELLE` varchar(50) DEFAULT NULL,
   PRIMARY KEY (`ETAT_CODE`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_bin;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_bin;
 
 --
 -- Déchargement des données de la table `etat`
@@ -529,6 +529,8 @@ CREATE TABLE IF NOT EXISTS `offrir` (
 --
 
 INSERT INTO `offrir` (`OFF_QTE`, `MED_DEPOTLEGAL`, `RAP_NUM`, `COL_MATRICULE`) VALUES
+(10, 'AMOPIL7', 14, 'a131'),
+(5, 'EVILR7', 14, 'a131'),
 (10, 'JOVAI8', 9, 'a131');
 
 -- --------------------------------------------------------
@@ -657,7 +659,7 @@ INSERT INTO `praticien` (`PRA_NUM`, `PRA_PRENOM`, `PRA_NOM`, `PRA_ADRESSE`, `PRA
 (44, 'Jean-Pierre', 'Desfaudais', '7 pl St Gilles', '29000', 'BREST', 71.76, 'PH'),
 (45, 'JérÃ´me', 'Phan', '9 r Clos Caillet', '79000', 'NIORT', 451.61, 'PO'),
 (46, 'Line', 'Riou', '43 bd Gén Vanier', '77000', 'MARNE LA VALLEE', 193.25, 'MH'),
-(47, 'Louis', 'Chubilleau', '46 r Eglise', '17000', 'SAINTES', 202.07, 'MV'),
+(47, 'Louis', 'Chubilleau', '46 r Eglise', '17000', 'SAINTES', 202, 'MV'),
 (48, 'Lucette', 'Lebrun', '178 r Auge', '54000', 'NANCY', 410.41, 'PS'),
 (49, 'Marc', 'Goessens', '6 av 6 Juin', '39000', 'DOLE', 548.57, 'PH'),
 (50, 'Marc', 'Laforge', '5 résid Prairie', '50000', 'SAINT LO', 265.05, 'PO'),
@@ -775,9 +777,12 @@ INSERT INTO `rapport_visite` (`COL_MATRICULE`, `RAP_NUM`, `RAP_DATEVISITE`, `RAP
 ('a131', 10, '2025-11-12', 'ezrt', 2, 81, NULL, 'ADIMOL9', 'AMOX45', '', 1),
 ('a131', 11, '2005-11-21', 'test', 5, 74, NULL, NULL, NULL, 'aaaaaa', 2),
 ('a131', 12, '2025-11-11', 'aezaerzrz', 1, 81, NULL, NULL, NULL, '', 2),
-('a131', 13, '2025-11-27', 'zzaeaz', 2, 47, NULL, NULL, NULL, '', 1),
+('a131', 13, '2025-11-27', 'zzaeaz', 2, 47, NULL, NULL, NULL, '', 2),
+('a131', 14, '2026-04-27', 'bien', 2, 88, NULL, 'ADIMOL9', 'AMOPIL7', '', 2),
 ('b16', 1, '2025-12-01', 'rtytrutr', 1, 81, NULL, NULL, NULL, '', 2),
-('b16', 2, '2025-12-02', 'test', 1, 41, 56, NULL, NULL, '', 2);
+('b16', 2, '2025-12-02', 'test', 1, 41, 56, NULL, NULL, '', 2),
+('b28', 1, '2026-04-25', 'Visite de routine, bon accueil du praticien. Discussion sur les nouveaux traitements.', 1, 9, NULL, 'AMOX45', NULL, '', 2),
+('b28', 2, '2026-04-20', 'Suivi prescription, le praticien souhaite plus d infos sur DOLRIL.', 2, 65, NULL, 'DOLRIL7', NULL, '', 2);
 
 -- --------------------------------------------------------
 
@@ -1002,6 +1007,19 @@ ALTER TABLE `medicament`
 --
 ALTER TABLE `praticien`
   ADD CONSTRAINT `praticien_type_praticien0_FK` FOREIGN KEY (`TYP_CODE`) REFERENCES `type_praticien` (`TYP_CODE`);
+
+--
+-- Contraintes pour la table `rapport_visite`
+--
+ALTER TABLE `rapport_visite`
+  ADD CONSTRAINT `FK_rapport_collaborateur` FOREIGN KEY (`COL_MATRICULE`) REFERENCES `collaborateur` (`COL_MATRICULE`),
+  ADD CONSTRAINT `FK_rapport_etat` FOREIGN KEY (`ETAT_CODE`) REFERENCES `etat` (`ETAT_CODE`),
+  ADD CONSTRAINT `FK_rapport_medicament1` FOREIGN KEY (`MED_DEPOTLEGAL_1`) REFERENCES `medicament` (`MED_DEPOTLEGAL`),
+  ADD CONSTRAINT `FK_rapport_medicament2` FOREIGN KEY (`MED_DEPOTLEGAL_2`) REFERENCES `medicament` (`MED_DEPOTLEGAL`),
+  ADD CONSTRAINT `FK_rapport_praticien` FOREIGN KEY (`PRA_NUM`) REFERENCES `praticien` (`PRA_NUM`),
+  ADD CONSTRAINT `FK_rapport_praticien_remplacant` FOREIGN KEY (`PRA_NUM_praticien`) REFERENCES `praticien` (`PRA_NUM`),
+  ADD CONSTRAINT `FK_rv_med1` FOREIGN KEY (`MED_DEPOTLEGAL_1`) REFERENCES `medicament` (`MED_DEPOTLEGAL`),
+  ADD CONSTRAINT `FK_rv_med2` FOREIGN KEY (`MED_DEPOTLEGAL_2`) REFERENCES `medicament` (`MED_DEPOTLEGAL`);
 
 --
 -- Contraintes pour la table `region`
