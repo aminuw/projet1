@@ -1,0 +1,22 @@
+Mission USR2 - Consulter medicament
+
+1. Objectif :
+Afficher les informations détaillées concernant un médicament sélectionné par un visiteur médical ou un délégué.
+
+2. Fonctionnalités implémentées :
+- Récupération de la liste des médicaments depuis la base de données (id et nom).
+- Affichage d'une liste déroulante pour la sélection d'un médicament.
+- Affichage des informations complètes du médicament après sélection.
+
+3. Tests et Validation :
+- Tester la sélection d'un médicament valide et vérifier l'affichage de ses informations.
+- Vérifier le comportement si la liste est vide ou si un médicament introuvable est recherché.
+
+4. Sécurité et Robustesse :
+- Vérifier que l'utilisateur est bien connecté avec les droits adéquats.
+- Prévenir les erreurs d'affichage liées à des données manquantes en base.
+
+5. Fichiers concernés :
+- Contrôleur : controleur/c_medicaments.php
+- Modèle : modele/medicament.modele.inc.php
+- Vues : vues/v_formulaireMedicament.php, vues/v_afficherMedicament.php

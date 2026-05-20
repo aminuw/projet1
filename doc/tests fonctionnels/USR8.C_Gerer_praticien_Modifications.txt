@@ -1,0 +1,25 @@
+Mission USR8.C - Gérer praticien - Modifications Praticien
+
+1. Objectif :
+Permettre la modification des informations d'un praticien existant pour assurer la mise à jour régulière des données.
+
+2. Fonctionnalités implémentées :
+- Sélection d'un praticien et affichage de ses informations actuelles pré-remplies.
+- Formulaire permettant la modification de chaque champ, sauf l'identifiant (id) qui est verrouillé.
+- Bouton de confirmation pour valider et exécuter la requête SQL de mise à jour (UPDATE).
+- Message confirmant le succès ou l'échec de la modification.
+
+3. Tests et Validation :
+- Tester la modification d'un champ autorisé (ex: adresse, spécialité) et valider.
+- Vérifier que le champ "id praticien" est bien impossible à modifier.
+- S'assurer que les nouvelles informations remplacent correctement les anciennes après validation.
+
+4. Sécurité et Robustesse :
+- L'identifiant (clé primaire) ne doit pas pouvoir être modifié pour garantir l'intégrité de la BDD.
+- La modification est restreinte aux utilisateurs ayant les privilèges nécessaires.
+- Les requêtes UPDATE doivent être sécurisées contre les injections.
+
+5. Fichiers concernés :
+- Contrôleur : controleur/c_praticien.php
+- Modèle : modele/praticien.modele.inc.php
+- Vues : vues/v_selectionModifierPraticien.php, vues/v_modifierPraticien.php

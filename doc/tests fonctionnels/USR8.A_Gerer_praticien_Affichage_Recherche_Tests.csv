@@ -1,0 +1,4 @@
+Étapes;Description du test;Résultat attendu;Résultat obtenu;Conformité
+1;Tester la recherche et l'affichage des informations d'un praticien existant;La liste déroulante propose le praticien, et sa sélection affiche ses informations détaillées correctement;La page de détails affiche avec succès le nom, prénom, adresse et spécialités du praticien sélectionné;ok
+2;Vérifier le filtrage des praticiens (par région ou autre critère);Les praticiens affichés dans la liste sont restreints selon le critère appliqué;La requête SQL appliquée filtre correctement et ne liste que les praticiens du secteur concerné;ok
+3;S'assurer que les informations affichées correspondent bien au praticien sélectionné;Les données affichées (nom, spécialité, ville) sont exactes et correspondent à la base de données;Toutes les données affichées correspondent précisément à l'ID du praticien choisi dans la liste;ok

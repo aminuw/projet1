@@ -1,0 +1,4 @@
+Étapes;Description du test;Résultat attendu;Résultat obtenu;Conformité
+1;Tester la modification d'un champ autorisé (ex: adresse, spécialité) et valider;Les données sont mises à jour en BDD et un message de confirmation s'affiche;La requête UPDATE s'exécute correctement sur les champs modifiés, et l'utilisateur reçoit une confirmation de mise à jour;ok
+2;Vérifier que le champ "id praticien" est bien impossible à modifier;Le champ contenant l'ID est grisé/désactivé et inaltérable;Le champ identifiant est verrouillé (attribut readonly/disabled sur la vue PHP), modification empêchée;ok
+3;S'assurer que les nouvelles informations remplacent correctement les anciennes;Lors de l'affichage ultérieur de ce praticien, ce sont bien les nouvelles données qui apparaissent;Les modifications sont effectives, le formulaire de consultation affiche immédiatement les nouvelles valeurs enregistrées;ok

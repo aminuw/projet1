@@ -1,0 +1,25 @@
+Mission USR8.B - Gérer praticien - Ajout Praticien
+
+1. Objectif :
+Permettre l'ajout d'un nouveau praticien dans le système pour maintenir la base de données des professionnels de santé à jour.
+
+2. Fonctionnalités implémentées :
+- Affichage d'un formulaire de saisie pour ajouter un praticien.
+- Contrôle de saisie pour vérifier que les champs obligatoires ne sont pas vides.
+- Requête SQL d'insertion pour enregistrer les données en BDD.
+- Confirmation de l'ajout via un message (ou erreur si échec).
+
+3. Tests et Validation :
+- Tester l'ajout d'un praticien avec tous les champs remplis correctement.
+- Tester l'ajout d'un praticien en laissant des champs obligatoires vides.
+- Vérifier l'insertion effective du nouveau praticien dans le système (ex: recherche).
+
+4. Sécurité et Robustesse :
+- Blocage de l'insertion et affichage d'un message d'erreur si des informations requises manquent.
+- Vérification des droits de l'utilisateur (seuls certains rôles peuvent ajouter un praticien).
+- Protection contre les injections SQL (requêtes préparées).
+
+5. Fichiers concernés :
+- Contrôleur : controleur/c_praticien.php
+- Modèle : modele/praticien.modele.inc.php
+- Vues : vues/v_ajoutPraticien.php

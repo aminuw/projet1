@@ -1,0 +1,25 @@
+Mission USR7 - Se connecter
+
+1. Objectif :
+Permettre à un visiteur médical ou un délégué de s'authentifier pour accéder aux pages dédiées à son profil.
+
+2. Fonctionnalités implémentées :
+- Saisie du login et du mot de passe via un formulaire.
+- Validation des identifiants en les comparant avec la base de données.
+- Connexion sécurisée et redirection vers l'accueil approprié.
+- Déconnexion.
+
+3. Tests et Validation :
+- Tester la connexion avec des identifiants valides (visiteur et délégué).
+- Tester la connexion avec des identifiants invalides (login ou mot de passe erroné).
+- Vérifier l'accès aux pages réservées en fonction du rôle.
+
+4. Sécurité et Robustesse :
+- L'utilisateur non authentifié ne doit pas pouvoir accéder aux pages protégées.
+- Les identifiants doivent être traités de manière sécurisée (contrôleur).
+- Un message d'erreur clair doit s'afficher en cas d'échec de connexion.
+
+5. Fichiers concernés :
+- Contrôleur : controleur/c_connexion.php
+- Modèle : modele/connexion.modele.inc.php
+- Vues : vues/v_connexion.php, vues/v_accueil.php

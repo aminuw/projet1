@@ -1,0 +1,3 @@
+Étapes;Description du test;Résultat attendu;Résultat obtenu;Conformité
+1;Tester la sélection d'un médicament valide et vérifier l'affichage de ses informations;Les informations complètes du médicament s'affichent correctement;Affichage détaillé du nom, de la composition et des informations du médicament sélectionné dans la liste déroulante;ok
+2;Vérifier le comportement si la liste est vide ou si un médicament introuvable est recherché;Un message clair informe qu'aucun médicament ne correspond à la sélection;La page gère l'absence de médicament sans erreur fatale, un message de retour ou un formulaire vide est présenté;ok

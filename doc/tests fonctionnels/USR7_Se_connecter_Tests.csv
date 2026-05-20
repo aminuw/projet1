@@ -1,0 +1,4 @@
+Étapes;Description du test;Résultat attendu;Résultat obtenu;Conformité
+1;Tester la connexion avec des identifiants valides (visiteur et délégué);L'utilisateur est authentifié et redirigé vers l'accueil avec les bonnes autorisations;Redirection réussie vers la page Profil pour l'utilisateur 'villou', menu ajusté selon son rôle;ok
+2;Tester la connexion avec des identifiants invalides;Un message d'erreur s'affiche et la connexion est refusée;Affichage du message d'erreur "Informations incorrectes !" et blocage de la connexion;ok
+3;Vérifier l'accès aux pages réservées en fonction du rôle;Les pages ne sont accessibles qu'après une connexion réussie avec le bon rôle;Les menus et pages restreintes sont inaccessibles si non connecté ou rôle inadéquat;ok

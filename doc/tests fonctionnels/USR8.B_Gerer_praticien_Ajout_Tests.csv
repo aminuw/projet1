@@ -1,0 +1,4 @@
+Étapes;Description du test;Résultat attendu;Résultat obtenu;Conformité
+1;Tester l'ajout d'un praticien avec tous les champs remplis correctement;L'ajout est réussi, un message de confirmation s'affiche;La requête SQL d'insertion est exécutée avec succès en base, un message de confirmation est affiché à l'utilisateur;ok
+2;Tester l'ajout d'un praticien en laissant des champs obligatoires vides;L'ajout échoue et un message indique les cases manquantes;Le contrôleur intercepte le champ vide et affiche correctement le message d'erreur stipulant les champs manquants;ok
+3;Vérifier l'insertion effective du nouveau praticien dans le système;Le praticien ajouté apparaît dans la liste des praticiens disponibles;Le nouveau praticien est bien récupéré par la requête SELECT et affiché dans la liste déroulante des praticiens;ok

@@ -1,0 +1,23 @@
+Mission USR8.A - Gérer praticien - Affichage et recherche
+
+1. Objectif :
+Afficher la liste des praticiens et permettre de les rechercher (par nom, spécialité ou ville) afin d'accéder facilement à leurs informations.
+
+2. Fonctionnalités implémentées :
+- Requêtes SQL pour récupérer les praticiens (par région ou liste globale).
+- Affichage d'un formulaire avec liste déroulante pour sélectionner un praticien.
+- Affichage des informations détaillées du praticien une fois sélectionné.
+
+3. Tests et Validation :
+- Tester la recherche et l'affichage des informations d'un praticien existant.
+- Vérifier le filtrage des praticiens (par région ou autre critère).
+- S'assurer que les informations affichées correspondent bien au praticien sélectionné.
+
+4. Sécurité et Robustesse :
+- L'accès à cette fonctionnalité nécessite une authentification valide.
+- Protection contre les injections SQL dans les requêtes de recherche.
+
+5. Fichiers concernés :
+- Contrôleur : controleur/c_praticien.php
+- Modèle : modele/praticien.modele.inc.php
+- Vues : vues/v_formulairePraticien.php, vues/v_afficherPraticien.php
